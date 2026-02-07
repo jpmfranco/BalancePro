@@ -1,0 +1,17 @@
+<button class="btnback" (click)="back()">Regresar</button>
+<div class="form-container">
+    <form action="">
+        <h1>Agregar gasto</h1>
+        <h4>Nombre producto</h4>
+        <input type="text">
+        <h4>Costo del producto</h4>
+        <input type="number" name="costo" id="costos">
+        <h4>Mes</h4>
+        <select name="" id="">
+            <option value="">Selecciona una opción</option>
+            @for(a of ListMes;track $index){
+                <option value="{{a}}">{{a}}</option>
+            }
+        </select>
+    </form>
+</div>

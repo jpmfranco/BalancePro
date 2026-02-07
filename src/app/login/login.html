@@ -1,0 +1,74 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="logo">💰</div>
+      <h1>Balance Pro</h1>
+      <p>Inicia sesión para continuar</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="login-form">
+      <!-- Usuario -->
+      <div class="form-group">
+        <label for="username">Usuario</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          [value]="username()"
+          (input)="updateUsername($any($event.target).value)"
+          (focus)="clearError()"
+          placeholder="Ingresa tu usuario"
+          [disabled]="isLoading()"
+          autocomplete="username"
+          required
+        />
+      </div>
+
+      <!-- Contraseña -->
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          [value]="password()"
+          (input)="updatePassword($any($event.target).value)"
+          (focus)="clearError()"
+          placeholder="Ingresa tu contraseña"
+          [disabled]="isLoading()"
+          autocomplete="current-password"
+          required
+        />
+      </div>
+
+      <!-- Mensaje de error -->
+      @if (errorMessage()) {
+        <div class="error-message">
+          <span>⚠️ {{ errorMessage() }}</span>
+        </div>
+      }
+
+      <!-- Botón de submit -->
+      <button 
+        type="submit" 
+        class="login-button"
+        [disabled]="isLoading()"
+      >
+        @if (!isLoading()) {
+          <span>Iniciar sesión</span>
+        } @else {
+          <span class="loading-spinner">⏳ Cargando...</span>
+        }
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <a href="javascript:void(0)">¿Olvidaste tu contraseña?</a>
+    </div>
+
+    <!-- Credenciales de prueba -->
+    <div class="demo-credentials">
+      <p><strong>Demo:</strong> admin / admin123</p>
+    </div>
+  </div>
+</div>

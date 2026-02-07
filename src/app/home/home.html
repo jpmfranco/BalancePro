@@ -1,0 +1,27 @@
+<div class="btn">
+  <button routerLink="/gastos">Ingresar gasto</button>
+  <button routerLink="/ingresos">Ingresar ingresos</button>
+</div>
+<div class="contentbox">
+  <div class="ingresos">
+    <h2>Ingresos</h2>
+    <div >
+      @for(a of ingresos;track $index){
+        <p>{{a}}</p>
+      }
+    </div>
+  </div>
+  <div class="total">
+    <h2>Monto total</h2>
+
+  </div>
+  <div class="egresos">
+    <h2>Egresos</h2>
+    <div >
+      @for(a of egresos;track $index){
+        <p>{{a}}</p>
+      }
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,78 @@
+<!-- Header -->
+<header class="header">
+  <div class="header-content">
+    <div class="logo">💰 Balance Pro</div>
+    <button class="mobile-menu-toggle" (click)="toggleMenu()">☰</button>
+    <ul class="nav-menu" [class.active]="menuOpen()">
+      <li><a href="javascript:void(0)" (click)="navigateTo('')">Overview</a></li>
+      <li><a href="javascript:void(0)" (click)="navigateTo('busqueda')">Búsqueda</a></li>
+      <li><a href="javascript:void(0)" class="active">Proyección</a></li>
+      <li><a href="javascript:void(0)" class="logout-btn" (click)="logout()">Cerrar sesión</a></li>
+    </ul>
+  </div>
+</header>
+
+<div class="pred-container">
+  <h2>Proyección financiera (Próximos 3 meses)</h2>
+  
+  <!-- Balances mensuales -->
+  <div class="months">
+    @for (projection of monthlyProjections; track projection.month) {
+      <div class="month-card">
+        <h3>{{ projection.month }}</h3>
+        <p class="balance" [class.positivo]="projection.isPositive" [class.negativo]="!projection.isPositive">
+          ${{ projection.balance.toLocaleString() }}
+        </p>
+        <span>Balance estimado</span>
+      </div>
+    }
+  </div>
+  
+  <!-- Sección inferior -->
+  <div class="bottom-section">
+    <!-- Gráfica -->
+    <div class="chart-card">
+      <h4>Ingresos vs Egresos</h4>
+      <apx-chart
+        [series]="chartOptions.series!"
+        [chart]="chartOptions.chart!"
+        [xaxis]="chartOptions.xaxis!"
+        [yaxis]="chartOptions.yaxis!"
+        [stroke]="chartOptions.stroke!"
+        [colors]="chartOptions.colors!"
+        [dataLabels]="chartOptions.dataLabels!"
+        [legend]="chartOptions.legend!"
+        [fill]="chartOptions.fill!">
+      </apx-chart>
+    </div>
+    
+    <!-- Tabla de movimientos -->
+    <div class="table-card">
+      <h4>Movimientos estimados</h4>
+      <table>
+        <thead>
+          <tr>
+            <th>Concepto</th>
+            <th>Tipo</th>
+            <th>Monto</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (movement of movements; track movement.concepto) {
+            <tr>
+              <td>{{ movement.concepto }}</td>
+              <td [class.ingreso]="movement.tipo === 'Ingreso'" 
+                  [class.egreso]="movement.tipo === 'Egreso'">
+                {{ movement.tipo }}
+              </td>
+              <td [class.ingreso]="movement.tipo === 'Ingreso'" 
+                  [class.egreso]="movement.tipo === 'Egreso'">
+                {{ formatCurrency(movement.monto) }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

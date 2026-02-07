@@ -1,0 +1,98 @@
+<!-- Header -->
+<header class="header">
+  <div class="header-content">
+    <div class="logo">💰 Balance Pro</div>
+    <button class="mobile-menu-toggle" (click)="toggleMenu()">☰</button>
+    <ul class="nav-menu" [class.active]="menuOpen()">
+      <li><a href="javascript:void(0)" (click)="navigateTo('')">Overview</a></li>
+      <li><a href="javascript:void(0)" class="active">Búsqueda</a></li>
+      <li><a href="javascript:void(0)" (click)="navigateTo('prediccion')">Proyección</a></li>
+      <li><a href="javascript:void(0)" class="logout-btn" (click)="logout()">Cerrar sesión</a></li>
+    </ul>
+  </div>
+</header>
+
+<div class="table-container">
+  <!-- Barra de búsqueda -->
+  <div class="search-bar">
+    <input 
+      type="text" 
+      id="searchInput" 
+      placeholder="Buscar movimiento..."
+      [value]="searchText()"
+      (input)="onSearchChange($any($event.target).value)"
+    >
+  </div>
+  
+  <!-- Filtros -->
+  <div class="filters">
+    <span>Filtrar por:</span>
+    <div class="dropdown">
+      <button class="dropdown-btn" (click)="toggleDropdown()">
+        Tipo ▾
+      </button>
+      <div class="dropdown-content" [class.show]="dropdownOpen()">
+        <label>
+          <input 
+            type="checkbox" 
+            class="filter-checkbox"
+            [checked]="showIngresos()"
+            (change)="toggleIngresos()"
+          >
+          Ingresos
+        </label>
+        <label>
+          <input 
+            type="checkbox" 
+            class="filter-checkbox"
+            [checked]="showEgresos()"
+            (change)="toggleEgresos()"
+          >
+          Egresos
+        </label>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Tabla -->
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Nombre</th>
+        <th>Tipo</th>
+        <th>Monto</th>
+        <th>Detalles</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (filteredTransactions().length === 0) {
+        <tr>
+          <td colspan="5" class="no-results">
+            No se encontraron resultados
+          </td>
+        </tr>
+      }
+      @for (transaction of filteredTransactions(); track transaction.fecha + transaction.nombre) {
+        <tr>
+          <td>{{ transaction.fecha }}</td>
+          <td>{{ transaction.nombre }}</td>
+          <td class="tipo" [class.ingreso]="transaction.tipo === 'Ingreso'" [class.egreso]="transaction.tipo === 'Egreso'">
+            {{ transaction.tipo }}
+          </td>
+          <td class="monto" [class.ingreso]="transaction.tipo === 'Ingreso'" [class.egreso]="transaction.tipo === 'Egreso'">
+            {{ formatCurrency(transaction.monto) }}
+          </td>
+          <td>
+            <button class="detail-btn" (click)="viewDetails(transaction)">Ver</button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  
+  <!-- Contador de resultados -->
+  <div class="results-count">
+    Mostrando {{ filteredTransactions().length }} de {{ allTransactions.length }} movimientos
+  </div>
+</div>

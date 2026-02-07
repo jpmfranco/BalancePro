@@ -1,0 +1,55 @@
+<!-- Header -->
+<header class="header">
+  <div class="header-content">
+    <div class="logo">💰 Balance Pro</div>
+    <button class="mobile-menu-toggle" (click)="toggleMenu()">☰</button>
+    <ul class="nav-menu" [class.active]="menuOpen()">
+      <li><a href="javascript:void(0)" routerLink="" class="active">Overview</a></li>
+      <li><a href="javascript:void(0)"  routerLink="busqueda"(click)="navigateTo('busqueda')">Búsqueda</a></li>
+      <li><a href="javascript:void(0)" routerLink="prediccion" (click)="navigateTo('prediccion')">Proyección</a></li>
+      <li><a href="javascript:void(0)" class="logout-btn" (click)="logout()">Cerrar sesión</a></li>
+    </ul>
+  </div>
+</header>
+
+<div class="overview-container">
+  <!-- BALANCE -->
+  <div class="balance-card">
+    <span class="balance-label">Balance actual</span>
+    <span class="balance-amount">{{ formattedBalance() }}</span>
+    <span class="balance-period">Últimos 7 días</span>
+  </div>
+  
+  <!-- ACCESOS DIRECTOS -->
+  <div class="quick-access">
+    <a href="javascript:void(0)" class="quick-card" (click)="navigateTo('busqueda')">
+      🔍<br>Búsqueda
+    </a>
+    <a href="javascript:void(0)" class="quick-card" (click)="navigateTo('proyeccion')">
+      📊<br>Proyección
+    </a>
+    <a href="javascript:void(0)" class="quick-card" (click)="navigateTo('perfil')">
+      👤<br>Perfil
+    </a>
+  </div>
+  
+  <!-- GRÁFICA CON APEXCHARTS -->
+  <div class="chart-card">
+    <h3>Movimientos últimos 7 días</h3>
+    <div class="chart-wrapper">
+      <apx-chart
+        [series]="chartOptions.series!"
+        [chart]="chartOptions.chart!"
+        [xaxis]="chartOptions.xaxis!"
+        [yaxis]="chartOptions.yaxis!"
+        [stroke]="chartOptions.stroke!"
+        [markers]="chartOptions.markers!"
+        [colors]="chartOptions.colors!"
+        [dataLabels]="chartOptions.dataLabels!"
+        [grid]="chartOptions.grid!"
+        [legend]="chartOptions.legend!"
+        [fill]="chartOptions.fill!">
+      </apx-chart>
+    </div>
+  </div>
+</div>
