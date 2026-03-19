@@ -1,0 +1,143 @@
+<div class="registro-container">
+  <div class="registro-card">
+    <div class="registro-header">
+      <div class="logo">💰</div>
+      <h1>Balance Pro</h1>
+      <p>Crea tu cuenta gratis</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="registro-form">
+      <!-- Nombre -->
+      <div class="form-group">
+        <label for="nombre">Nombre completo *</label>
+        <input
+          type="text"
+          id="nombre"
+          [value]="usuario().nombre"
+          (input)="updateField('nombre', $any($event.target).value)"
+          placeholder="Ingresa tu nombre"
+          [disabled]="isLoading()"
+          required
+        />
+      </div>
+
+      <!-- Género -->
+      <div class="form-group">
+        <label for="genero">Género</label>
+        <select
+          id="genero"
+          [value]="usuario().genero"
+          (change)="updateField('genero', $any($event.target).value)"
+          [disabled]="isLoading()"
+        >
+          <option value="">Selecciona...</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Femenino">Femenino</option>
+          <option value="Otro">Otro</option>
+          <option value="Prefiero no decir">Prefiero no decir</option>
+        </select>
+      </div>
+
+      <!-- Edad -->
+      <div class="form-group">
+        <label for="edad">Edad</label>
+        <input
+          type="number"
+          id="edad"
+          [value]="usuario().edad"
+          (input)="updateField('edad', +$any($event.target).value)"
+          placeholder="Tu edad"
+          min="18"
+          max="120"
+          [disabled]="isLoading()"
+        />
+      </div>
+
+      <!-- Correo -->
+      <div class="form-group">
+        <label for="correo">Correo electrónico *</label>
+        <input
+          type="email"
+          id="correo"
+          [value]="usuario().correo"
+          (input)="updateField('correo', $any($event.target).value)"
+          placeholder="tu@email.com"
+          [disabled]="isLoading()"
+          required
+        />
+      </div>
+
+      <!-- Celular -->
+      <div class="form-group">
+        <label for="celular">Celular</label>
+        <input
+          type="tel"
+          id="celular"
+          [value]="usuario().celular"
+          (input)="updateField('celular', $any($event.target).value)"
+          placeholder="1234567890"
+          [disabled]="isLoading()"
+        />
+      </div>
+
+      <!-- Contraseña -->
+      <div class="form-group">
+        <label for="contraseña">Contraseña *</label>
+        <input
+          type="password"
+          id="contraseña"
+          [value]="usuario().contrasena"
+          (input)="updateField('contrasena', $any($event.target).value)"
+          placeholder="Mínimo 6 caracteres"
+          [disabled]="isLoading()"
+          required
+        />
+      </div>
+
+      <!-- Confirmar Contraseña -->
+      <div class="form-group">
+        <label for="confirmarContraseña">Confirmar contraseña *</label>
+        <input
+          type="password"
+          id="confirmarContraseña"
+          [value]="usuario().confirmarContrasena"
+          (input)="updateField('confirmarContrasena', $any($event.target).value)"
+          placeholder="Repite tu contraseña"
+          [disabled]="isLoading()"
+          required
+        />
+      </div>
+
+      <!-- Mensaje de error -->
+      @if (errorMessage()) {
+        <div class="error-message">
+          <span>⚠️ {{ errorMessage() }}</span>
+        </div>
+      }
+
+      <!-- Mensaje de éxito -->
+      @if (successMessage()) {
+        <div class="success-message">
+          <span>✅ {{ successMessage() }}</span>
+        </div>
+      }
+
+      <!-- Botón de submit -->
+      <button 
+        type="submit" 
+        class="registro-button"
+        [disabled]="isLoading()"
+      >
+        @if (!isLoading()) {
+          <span>Crear cuenta</span>
+        } @else {
+          <span class="loading-spinner">⏳ Registrando...</span>
+        }
+      </button>
+    </form>
+
+    <div class="login-link">
+      <p>¿Ya tienes cuenta? <a (click)="goToLogin()">Inicia sesión</a></p>
+    </div>
+  </div>
+</div>

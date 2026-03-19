@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 interface Transaction {
   fecha: string;
@@ -13,7 +13,7 @@ interface Transaction {
 @Component({
   selector: 'app-busqueda',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './busqueda.html',
   styleUrls: ['./busqueda.css']
 })

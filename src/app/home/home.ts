@@ -17,4 +17,22 @@ export class Home implements OnInit{
   ngOnInit(): void {
     this.variable = 3;
   }
+  //   toggleMenu(): void {
+  //   this.menuOpen.update(value => !value);
+  // }
+
+  // logout(): void {
+  //   sessionStorage.removeItem('usuario');
+  //   this.usuario.set('');
+  //   this.router.navigate(['/login']);
+  // }
+
+  // navigateTo(section: string): void {
+  //   console.log('Navegando a:', section);
+  //   this.router.navigate([section]);
+  // }
+
+  // updateBalance(newBalance: number): void {
+  //   this.balance.set(newBalance);
+  // }
 }

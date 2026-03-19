@@ -3,6 +3,8 @@ import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { NgApexchartsModule } from 'ng-apexcharts';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../enviroment/enviroment';
 import {
   ApexAxisChartSeries,
   ApexChart,
@@ -15,6 +17,21 @@ import {
   ApexLegend,
   ApexFill
 } from 'ng-apexcharts';
+
+interface Ingreso {
+  descripcion: string;
+  fecha: string;
+  monto: number;
+  idUsuario: number;
+}
+
+interface Gasto {
+  descripcion: string;
+  fecha: string;
+  monto: number;
+  categoria: string;
+  idUsuario: number;
+}
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -42,7 +59,43 @@ export class Overview implements OnInit {
   menuOpen = signal(false);
   usuario = signal('');
 
-  formattedBalance = computed(() => 
+  // Modales
+  showIngresoModal = signal(false);
+  showGastoModal = signal(false);
+  isLoading = signal(false);
+  errorMessage = signal('');
+  successMessage = signal('');
+
+  // Formulario de ingreso
+  ingreso = signal<Ingreso>({
+    descripcion: '',
+    fecha: new Date().toISOString().split('T')[0],
+    monto: 0,
+    idUsuario: 1
+  });
+
+  // Formulario de gasto
+  gasto = signal<Gasto>({
+    descripcion: '',
+    fecha: new Date().toISOString().split('T')[0],
+    monto: 0,
+    categoria: '',
+    idUsuario: 1
+  });
+
+  categorias = [
+    'Alimentación',
+    'Transporte',
+    'Vivienda',
+    'Servicios',
+    'Salud',
+    'Educación',
+    'Entretenimiento',
+    'Ropa',
+    'Otros'
+  ];
+
+  formattedBalance = computed(() =>
     '$' + this.balance().toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
@@ -136,7 +189,7 @@ export class Overview implements OnInit {
     }
   };
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private http: HttpClient) {}
 
   ngOnInit(): void {
     const usuario = sessionStorage.getItem('usuario');
@@ -160,9 +213,123 @@ export class Overview implements OnInit {
 
   navigateTo(section: string): void {
     console.log('Navegando a:', section);
+    this.router.navigate([section]);
   }
 
   updateBalance(newBalance: number): void {
     this.balance.set(newBalance);
+  }
+
+  // Métodos para Modal de Ingreso
+  openIngresoModal(): void {
+    this.showIngresoModal.set(true);
+    this.errorMessage.set('');
+    this.successMessage.set('');
+  }
+
+  closeIngresoModal(): void {
+    this.showIngresoModal.set(false);
+    this.ingreso.set({
+      descripcion: '',
+      fecha: new Date().toISOString().split('T')[0],
+      monto: 0,
+      idUsuario: 1
+    });
+    this.errorMessage.set('');
+    this.successMessage.set('');
+  }
+
+  updateIngresoField(field: keyof Ingreso, value: any): void {
+    this.ingreso.update(i => ({ ...i, [field]: value }));
+  }
+
+  onSubmitIngreso(): void {
+    this.errorMessage.set('');
+    this.successMessage.set('');
+
+    const ing = this.ingreso();
+
+    if (!ing.descripcion || !ing.fecha || ing.monto <= 0) {
+      this.errorMessage.set('Por favor, completa todos los campos correctamente');
+      return;
+    }
+
+    this.isLoading.set(true);
+
+    // Simular guardado (aquí iría tu llamada al API)
+    setTimeout(() => {
+      console.log('Ingreso registrado:', this.ingreso());
+      this.successMessage.set('¡Ingreso registrado exitosamente!');
+      this.isLoading.set(false);
+
+      setTimeout(() => {
+        this.closeIngresoModal();
+      }, 1500);
+    }, 1000);
+  }
+
+  // Métodos para Modal de Gasto
+  openGastoModal(): void {
+    this.showGastoModal.set(true);
+    this.errorMessage.set('');
+    this.successMessage.set('');
+  }
+
+  closeGastoModal(): void {
+    this.showGastoModal.set(false);
+    this.gasto.set({
+      descripcion: '',
+      fecha: new Date().toISOString().split('T')[0],
+      monto: 0,
+      categoria: '',
+      idUsuario: 1
+    });
+    this.errorMessage.set('');
+    this.successMessage.set('');
+  }
+
+  updateGastoField(field: keyof Gasto, value: any): void {
+    this.gasto.update(g => ({ ...g, [field]: value }));
+  }
+
+  onSubmitGasto(): void {
+    this.errorMessage.set('');
+    this.successMessage.set('');
+
+    const gas = this.gasto();
+
+    if (!gas.descripcion || !gas.fecha || gas.monto <= 0 || !gas.categoria) {
+      this.errorMessage.set('Por favor, completa todos los campos correctamente');
+      return;
+    }
+
+    this.isLoading.set(true);
+
+    const payload = {
+      descripcion: gas.descripcion,
+      categoria: gas.categoria,
+      fecha: new Date(gas.fecha).toISOString(),
+      monto: gas.monto,
+      idUsuario: gas.idUsuario
+    };
+
+    this.http.post(`${environment.apiGasto}/CrearGasto`, payload).subscribe({
+      next: (response) => {
+        console.log('Gasto registrado:', response);
+        this.successMessage.set('¡Gasto registrado exitosamente!');
+        this.isLoading.set(false);
+
+        setTimeout(() => {
+          this.closeGastoModal();
+        }, 1500);
+      },
+      error: (error) => {
+        console.error('Error al registrar gasto:', error);
+        this.errorMessage.set(
+          error.error?.message || 'Error al guardar el gasto. Intenta nuevamente.'
+        );
+        this.isLoading.set(false);
+      }
+    });
   }
 }

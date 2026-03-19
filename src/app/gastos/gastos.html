@@ -1,17 +1,110 @@
-<button class="btnback" (click)="back()">Regresar</button>
 <div class="form-container">
-    <form action="">
-        <h1>Agregar gasto</h1>
-        <h4>Nombre producto</h4>
-        <input type="text">
-        <h4>Costo del producto</h4>
-        <input type="number" name="costo" id="costos">
-        <h4>Mes</h4>
-        <select name="" id="">
-            <option value="">Selecciona una opción</option>
-            @for(a of ListMes;track $index){
-                <option value="{{a}}">{{a}}</option>
-            }
+  <div class="form-card">
+    <div class="form-header">
+      <h2> Registrar Gasto</h2>
+      <p>Agrega un nuevo gasto a tu cuenta</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="gasto-form">
+      <!-- Descripción -->
+      <div class="form-group">
+        <label for="descripcion">Descripción *</label>
+        <input
+          type="text"
+          id="descripcion"
+          [value]="gasto().descripcion"
+          (input)="updateField('descripcion', $any($event.target).value)"
+          placeholder="Ej: Compra supermercado, Pago renta, etc."
+          [disabled]="isLoading()"
+          required
+        />
+      </div>
+
+      <!-- Fecha -->
+      <div class="form-group">
+        <label for="fecha">Fecha *</label>
+        <input
+          type="date"
+          id="fecha"
+          [value]="gasto().fecha"
+          (input)="updateField('fecha', $any($event.target).value)"
+          [disabled]="isLoading()"
+          required
+        />
+      </div>
+
+      <!-- Categoría -->
+      <div class="form-group">
+        <label for="categoria">Categoría *</label>
+        <select
+          id="categoria"
+          [value]="gasto().categoria"
+          (change)="updateField('categoria', $any($event.target).value)"
+          [disabled]="isLoading()"
+          required
+        >
+          <option value="">Selecciona una categoría...</option>
+          @for (cat of categorias; track cat) {
+            <option [value]="cat">{{ cat }}</option>
+          }
         </select>
+      </div>
+
+      <!-- Monto -->
+      <div class="form-group">
+        <label for="monto">Monto *</label>
+        <div class="input-with-prefix">
+          <span class="prefix">$</span>
+          <input
+            type="number"
+            id="monto"
+            [value]="gasto().monto"
+            (input)="updateField('monto', +$any($event.target).value)"
+            placeholder="0.00"
+            step="0.01"
+            min="0"
+            [disabled]="isLoading()"
+            required
+          />
+        </div>
+      </div>
+
+      <!-- Mensaje de error -->
+      @if (errorMessage()) {
+        <div class="error-message">
+          <span>⚠️ {{ errorMessage() }}</span>
+        </div>
+      }
+
+      <!-- Mensaje de éxito -->
+      @if (successMessage()) {
+        <div class="success-message">
+          <span>✅ {{ successMessage() }}</span>
+        </div>
+      }
+
+      <!-- Botones -->
+      <div class="form-actions">
+        <button 
+          type="button" 
+          class="cancel-button"
+          (click)="navigateTo('overview')"
+          [disabled]="isLoading()"
+        >
+          Cancelar
+        </button>
+        <button 
+          type="submit" 
+          class="submit-button"
+          [disabled]="isLoading()"
+        >
+          @if (!isLoading()) {
+            <span>Guardar Gasto</span>
+          } @else {
+            <span>⏳ Guardando...</span>
+          }
+        </button>
+      </div>
     </form>
+  </div>
 </div>

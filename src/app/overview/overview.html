@@ -1,18 +1,41 @@
-<!-- Header -->
-<header class="header">
-  <div class="header-content">
-    <div class="logo">💰 Balance Pro</div>
-    <button class="mobile-menu-toggle" (click)="toggleMenu()">☰</button>
-    <ul class="nav-menu" [class.active]="menuOpen()">
-      <li><a href="javascript:void(0)" routerLink="" class="active">Overview</a></li>
-      <li><a href="javascript:void(0)"  routerLink="busqueda"(click)="navigateTo('busqueda')">Búsqueda</a></li>
-      <li><a href="javascript:void(0)" routerLink="prediccion" (click)="navigateTo('prediccion')">Proyección</a></li>
-      <li><a href="javascript:void(0)" class="logout-btn" (click)="logout()">Cerrar sesión</a></li>
-    </ul>
+<!-- Sidebar -->
+<aside class="sidebar" [class.active]="menuOpen()">
+  <div class="sidebar-header">
+    <div class="logo">Balance Pro</div>
   </div>
-</header>
+  <nav class="sidebar-nav">
+    <a href="javascript:void(0)" routerLink="/overview" class="nav-item active">
+      <span class="nav-text">Overview</span>
+    </a>
+    <a href="javascript:void(0)" routerLink="/busqueda" class="nav-item">
+      <span class="nav-text">Búsqueda</span>
+    </a>
+    <a href="javascript:void(0)" routerLink="/proyeccion" class="nav-item">
+      <span class="nav-text">Proyección</span>
+    </a>
+    <a href="javascript:void(0)" routerLink="/perfil" class="nav-item">
+      <span class="nav-text">Perfil</span>
+    </a>
+    <div class="floating-buttons">
+    <button class="fab-ingreso" (click)="openIngresoModal()" title="Agregar Ingreso">
+      Añadir ingreso
+    </button>
+    <button class="fab-gasto" (click)="openGastoModal()" title="Agregar Gasto">
+      Añadir gasto
+    </button>
+  </div>
+    <a href="javascript:void(0)" (click)="logout()" class="nav-item logout">
+      <span class="nav-text">Cerrar sesión</span>
+    </a>
+  </nav>
+</aside>
 
-<div class="overview-container">
+<!-- Mobile Menu Toggle -->
+<button class="mobile-menu-toggle" (click)="toggleMenu()">Menu</button>
+
+<!-- Main Content -->
+<div class="main-content">
+  <div class="overview-container">
   <!-- BALANCE -->
   <div class="balance-card">
     <span class="balance-label">Balance actual</span>
@@ -23,13 +46,13 @@
   <!-- ACCESOS DIRECTOS -->
   <div class="quick-access">
     <a href="javascript:void(0)" class="quick-card" (click)="navigateTo('busqueda')">
-      🔍<br>Búsqueda
+      Búsqueda
     </a>
     <a href="javascript:void(0)" class="quick-card" (click)="navigateTo('proyeccion')">
-      📊<br>Proyección
+      Proyección
     </a>
     <a href="javascript:void(0)" class="quick-card" (click)="navigateTo('perfil')">
-      👤<br>Perfil
+      Perfil
     </a>
   </div>
   
@@ -51,5 +74,205 @@
         [fill]="chartOptions.fill!">
       </apx-chart>
     </div>
+    
+  </div>
   </div>
 </div>
+
+<!-- Modal de Ingreso -->
+@if (showIngresoModal()) {
+  <div class="modal-backdrop" (click)="closeIngresoModal()">
+    <div class="modal-content-ingreso" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2> Registrar Ingreso</h2>
+        <button class="close-btn" (click)="closeIngresoModal()">✕</button>
+      </div>
+
+      <form (ngSubmit)="onSubmitIngreso()" class="modal-form">
+        <div class="form-group">
+          <label for="ingreso-descripcion">Descripción *</label>
+          <input
+            type="text"
+            id="ingreso-descripcion"
+            [value]="ingreso().descripcion"
+            (input)="updateIngresoField('descripcion', $any($event.target).value)"
+            placeholder="Ej: Salario mensual, Venta producto, etc."
+            [disabled]="isLoading()"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="ingreso-fecha">Fecha *</label>
+          <input
+            type="date"
+            id="ingreso-fecha"
+            [value]="ingreso().fecha"
+            (input)="updateIngresoField('fecha', $any($event.target).value)"
+            [disabled]="isLoading()"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="ingreso-monto">Monto *</label>
+          <div class="input-with-prefix">
+            <span class="prefix">$</span>
+            <input
+              type="number"
+              id="ingreso-monto"
+              [value]="ingreso().monto"
+              (input)="updateIngresoField('monto', +$any($event.target).value)"
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+              [disabled]="isLoading()"
+              required
+            />
+          </div>
+        </div>
+
+        @if (errorMessage()) {
+          <div class="error-message">
+            <span>⚠️ {{ errorMessage() }}</span>
+          </div>
+        }
+
+        @if (successMessage()) {
+          <div class="success-message">
+            <span>✅ {{ successMessage() }}</span>
+          </div>
+        }
+
+        <div class="form-actions">
+          <button
+            type="button"
+            class="cancel-button"
+            (click)="closeIngresoModal()"
+            [disabled]="isLoading()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="submit-button"
+            [disabled]="isLoading()"
+          >
+            @if (!isLoading()) {
+              <span>Guardar Ingreso</span>
+            } @else {
+              <span>⏳ Guardando...</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Modal de Gasto -->
+@if (showGastoModal()) {
+  <div class="modal-backdrop" (click)="closeGastoModal()">
+    <div class="modal-content-gasto" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2> Registrar Gasto</h2>
+        <button class="close-btn" (click)="closeGastoModal()">✕</button>
+      </div>
+
+      <form (ngSubmit)="onSubmitGasto()" class="modal-form">
+        <div class="form-group">
+          <label for="gasto-descripcion">Descripción *</label>
+          <input
+            type="text"
+            id="gasto-descripcion"
+            [value]="gasto().descripcion"
+            (input)="updateGastoField('descripcion', $any($event.target).value)"
+            placeholder="Ej: Compra supermercado, Pago renta, etc."
+            [disabled]="isLoading()"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="gasto-fecha">Fecha *</label>
+          <input
+            type="date"
+            id="gasto-fecha"
+            [value]="gasto().fecha"
+            (input)="updateGastoField('fecha', $any($event.target).value)"
+            [disabled]="isLoading()"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="gasto-categoria">Categoría *</label>
+          <select
+            id="gasto-categoria"
+            [value]="gasto().categoria"
+            (change)="updateGastoField('categoria', $any($event.target).value)"
+            [disabled]="isLoading()"
+            required
+          >
+            <option value="">Selecciona una categoría...</option>
+            @for (cat of categorias; track cat) {
+              <option [value]="cat">{{ cat }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="gasto-monto">Monto *</label>
+          <div class="input-with-prefix">
+            <span class="prefix">$</span>
+            <input
+              type="number"
+              id="gasto-monto"
+              [value]="gasto().monto"
+              (input)="updateGastoField('monto', +$any($event.target).value)"
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+              [disabled]="isLoading()"
+              required
+            />
+          </div>
+        </div>
+
+        @if (errorMessage()) {
+          <div class="error-message">
+            <span>⚠️ {{ errorMessage() }}</span>
+          </div>
+        }
+
+        @if (successMessage()) {
+          <div class="success-message">
+            <span>✅ {{ successMessage() }}</span>
+          </div>
+        }
+
+        <div class="form-actions">
+          <button
+            type="button"
+            class="cancel-button"
+            (click)="closeGastoModal()"
+            [disabled]="isLoading()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="submit-button"
+            [disabled]="isLoading()"
+          >
+            @if (!isLoading()) {
+              <span>Guardar Gasto</span>
+            } @else {
+              <span>⏳ Guardando...</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

@@ -1,18 +1,33 @@
-<!-- Header -->
-<header class="header">
-  <div class="header-content">
-    <div class="logo">💰 Balance Pro</div>
-    <button class="mobile-menu-toggle" (click)="toggleMenu()">☰</button>
-    <ul class="nav-menu" [class.active]="menuOpen()">
-      <li><a href="javascript:void(0)" (click)="navigateTo('')">Overview</a></li>
-      <li><a href="javascript:void(0)" class="active">Búsqueda</a></li>
-      <li><a href="javascript:void(0)" (click)="navigateTo('prediccion')">Proyección</a></li>
-      <li><a href="javascript:void(0)" class="logout-btn" (click)="logout()">Cerrar sesión</a></li>
-    </ul>
+<!-- Sidebar -->
+<aside class="sidebar" [class.active]="menuOpen()">
+  <div class="sidebar-header">
+    <div class="logo">Balance Pro</div>
   </div>
-</header>
+  <nav class="sidebar-nav">
+    <a href="javascript:void(0)" routerLink="/overview" class="nav-item">
+      <span class="nav-text">Overview</span>
+    </a>
+    <a href="javascript:void(0)" routerLink="/busqueda" class="nav-item active">
+      <span class="nav-text">Búsqueda</span>
+    </a>
+    <a href="javascript:void(0)" routerLink="/proyeccion" class="nav-item">
+      <span class="nav-text">Proyección</span>
+    </a>
+    <a href="javascript:void(0)" routerLink="/perfil" class="nav-item">
+      <span class="nav-text">Perfil</span>
+    </a>
+    <a href="javascript:void(0)" (click)="logout()" class="nav-item logout">
+      <span class="nav-text">Cerrar sesión</span>
+    </a>
+  </nav>
+</aside>
 
-<div class="table-container">
+<!-- Mobile Menu Toggle -->
+<button class="mobile-menu-toggle" (click)="toggleMenu()">Menu</button>
+
+<!-- Main Content -->
+<div class="main-content">
+  <div class="table-container">
   <!-- Barra de búsqueda -->
   <div class="search-bar">
     <input 
@@ -58,11 +73,11 @@
   <table id="dataTable">
     <thead>
       <tr>
-        <th>Fecha</th>
+        <th class="date">Fecha</th>
         <th>Nombre</th>
         <th>Tipo</th>
         <th>Monto</th>
-        <th>Detalles</th>
+        <th class="details">Detalles</th>
       </tr>
     </thead>
     <tbody>
@@ -94,5 +109,6 @@
   <!-- Contador de resultados -->
   <div class="results-count">
     Mostrando {{ filteredTransactions().length }} de {{ allTransactions.length }} movimientos
+  </div>
   </div>
 </div>

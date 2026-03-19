@@ -1,27 +1,25 @@
-<div class="btn">
-  <button routerLink="/gastos">Ingresar gasto</button>
-  <button routerLink="/ingresos">Ingresar ingresos</button>
-</div>
-<div class="contentbox">
-  <div class="ingresos">
-    <h2>Ingresos</h2>
-    <div >
-      @for(a of ingresos;track $index){
-        <p>{{a}}</p>
-      }
-    </div>
+<div class="container">
+  <!-- Sidebar -->
+<aside class="sidebar" >
+  <div class="sidebar-header">
+    <div class="logo">Balance Pro</div>
   </div>
-  <div class="total">
-    <h2>Monto total</h2>
-
-  </div>
-  <div class="egresos">
-    <h2>Egresos</h2>
-    <div >
-      @for(a of egresos;track $index){
-        <p>{{a}}</p>
-      }
-    </div>
-  </div>
-
+  <nav class="sidebar-nav">
+    <a href="javascript:void(0)" routerLink="" class="nav-item active">
+      <span class="nav-text">Overview</span>
+    </a>
+    <!-- <a href="javascript:void(0)" routerLink="busqueda" (click)="navigateTo('busqueda')" class="nav-item">
+      <span class="nav-text">Búsqueda</span>
+    </a>
+    <a href="javascript:void(0)" routerLink="prediccion" (click)="navigateTo('proyeccion')" class="nav-item">
+      <span class="nav-text">Proyección</span>
+    </a>
+    <a href="javascript:void(0)" routerLink="prediccion" (click)="navigateTo('perfil')" class="nav-item">
+      <span class="nav-text">Perfil</span>
+    </a>
+    <a href="javascript:void(0)" (click)="logout()" class="nav-item logout">
+      <span class="nav-text">Cerrar sesión</span>
+    </a> -->
+  </nav>
+</aside>
 </div>

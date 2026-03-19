@@ -1,0 +1,300 @@
+<!-- Sidebar -->
+<aside class="sidebar" [class.active]="menuOpen()">
+  <div class="sidebar-header">
+    <div class="logo">Balance Pro</div>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="javascript:void(0)" routerLink="/overview" class="nav-item">
+      <span class="nav-text">Overview</span>
+    </a>
+    <a href="javascript:void(0)" routerLink="/busqueda" class="nav-item">
+      <span class="nav-text">Búsqueda</span>
+    </a>
+    <a href="javascript:void(0)" routerLink="/proyeccion" class="nav-item">
+      <span class="nav-text">Proyección</span>
+    </a>
+    <a href="javascript:void(0)" routerLink="/perfil" class="nav-item active">
+      <span class="nav-text">Perfil</span>
+    </a>
+    <a href="javascript:void(0)" (click)="logout()" class="nav-item logout">
+      <span class="nav-text">Cerrar sesión</span>
+    </a>
+  </nav>
+</aside>
+
+<!-- Mobile Menu Toggle -->
+<button class="mobile-menu-toggle" (click)="toggleMenu()">Menu</button>
+
+<!-- Main Content -->
+<div class="main-content">
+  <div class="perfil-container">
+  <!-- Cabecera del perfil -->
+  <div class="profile-header">
+    <div class="avatar">
+      {{ usuario().nombre.charAt(0).toUpperCase() }}
+    </div>
+    <div class="profile-info">
+      <h1>{{ usuario().nombre }}</h1>
+      <p>{{ usuario().correo }}</p>
+      <span class="badge" [class.active]="usuario().activo" [class.inactive]="!usuario().activo">
+        {{ usuario().activo ? '✓ Activo' : '✗ Inactivo' }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Estadísticas -->
+  <div class="stats-grid">
+    <div class="stat-card ingreso">
+      <div class="stat-info">
+        <span class="stat-label">Total Ingresos</span>
+        <span class="stat-value">{{ formatCurrency(estadisticas().totalIngresos) }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card egreso">
+      <div class="stat-info">
+        <span class="stat-label">Total Gastos</span>
+        <span class="stat-value">{{ formatCurrency(estadisticas().totalGastos) }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card balance">
+      <div class="stat-info">
+        <span class="stat-label">Balance</span>
+        <span class="stat-value">{{ formatCurrency(estadisticas().balance) }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card transacciones">
+      <div class="stat-info">
+        <span class="stat-label">Transacciones</span>
+        <span class="stat-value">{{ estadisticas().totalTransacciones }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Información del perfil -->
+  <div class="profile-section">
+    <div class="section-header">
+      <h2>Información Personal</h2>
+      @if (!isEditing() && !isChangingPassword()) {
+        <button class="edit-btn" (click)="startEdit()">✏️ Editar</button>
+      }
+    </div>
+
+    <!-- Mensajes -->
+    @if (errorMessage()) {
+      <div class="error-message">
+        <span>⚠️ {{ errorMessage() }}</span>
+      </div>
+    }
+
+    @if (successMessage()) {
+      <div class="success-message">
+        <span>✅ {{ successMessage() }}</span>
+      </div>
+    }
+
+    <!-- Modo vista -->
+    @if (!isEditing() && !isChangingPassword()) {
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Nombre</span>
+          <span class="info-value">{{ usuario().nombre }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Género</span>
+          <span class="info-value">{{ usuario().genero || 'No especificado' }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Edad</span>
+          <span class="info-value">{{ usuario().edad || 'No especificada' }} años</span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Correo</span>
+          <span class="info-value">{{ usuario().correo }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Celular</span>
+          <span class="info-value">{{ usuario().celular || 'No especificado' }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Miembro desde</span>
+          <span class="info-value">{{ usuario().fechaRegistro }} ({{ diasRegistrado() }} días)</span>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="password-btn" (click)="openChangePassword()">
+          🔒 Cambiar Contraseña
+        </button>
+        <button class="deactivate-btn" (click)="deactivateAccount()">
+          ⚠️ Desactivar Cuenta
+        </button>
+      </div>
+    }
+
+    <!-- Modo edición -->
+    @if (isEditing()) {
+      <form (ngSubmit)="saveProfile()" class="edit-form">
+        <div class="form-group">
+          <label for="nombre">Nombre *</label>
+          <input
+            type="text"
+            id="nombre"
+            [value]="usuarioEdit().nombre"
+            (input)="updateEditField('nombre', $any($event.target).value)"
+            [disabled]="isLoading()"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="genero">Género</label>
+          <select
+            id="genero"
+            [value]="usuarioEdit().genero"
+            (change)="updateEditField('genero', $any($event.target).value)"
+            [disabled]="isLoading()"
+          >
+            <option value="">Selecciona...</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
+            <option value="Otro">Otro</option>
+            <option value="Prefiero no decir">Prefiero no decir</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="edad">Edad</label>
+          <input
+            type="number"
+            id="edad"
+            [value]="usuarioEdit().edad"
+            (input)="updateEditField('edad', +$any($event.target).value)"
+            min="18"
+            max="120"
+            [disabled]="isLoading()"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="correo">Correo *</label>
+          <input
+            type="email"
+            id="correo"
+            [value]="usuarioEdit().correo"
+            (input)="updateEditField('correo', $any($event.target).value)"
+            [disabled]="isLoading()"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="celular">Celular</label>
+          <input
+            type="tel"
+            id="celular"
+            [value]="usuarioEdit().celular"
+            (input)="updateEditField('celular', $any($event.target).value)"
+            [disabled]="isLoading()"
+          />
+        </div>
+
+        <div class="form-actions">
+          <button 
+            type="button" 
+            class="cancel-button"
+            (click)="cancelEdit()"
+            [disabled]="isLoading()"
+          >
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            class="save-button"
+            [disabled]="isLoading()"
+          >
+            @if (!isLoading()) {
+              <span>Guardar Cambios</span>
+            } @else {
+              <span>⏳ Guardando...</span>
+            }
+          </button>
+        </div>
+      </form>
+    }
+
+    <!-- Cambiar contraseña -->
+    @if (isChangingPassword()) {
+      <form (ngSubmit)="savePassword()" class="password-form">
+        <div class="form-group">
+          <label for="contraseñaActual">Contraseña Actual *</label>
+          <input
+            type="password"
+            id="contraseñaActual"
+            [value]="contrasenaActual()"
+            (input)="contrasenaActual.set($any($event.target).value)"
+            placeholder="Ingresa tu contraseña actual"
+            [disabled]="isLoading()"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="contraseñaNueva">Nueva Contraseña *</label>
+          <input
+            type="password"
+            id="contraseñaNueva"
+            [value]="contrasenaNueva()"
+            (input)="contrasenaNueva.set($any($event.target).value)"
+            placeholder="Mínimo 6 caracteres"
+            [disabled]="isLoading()"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="confirmarContraseña">Confirmar Nueva Contraseña *</label>
+          <input
+            type="password"
+            id="confirmarContraseña"
+            [value]="confirmarContrasena()"
+            (input)="confirmarContrasena.set($any($event.target).value)"
+            placeholder="Repite tu nueva contraseña"
+            [disabled]="isLoading()"
+            required
+          />
+        </div>
+
+        <div class="form-actions">
+          <button 
+            type="button" 
+            class="cancel-button"
+            (click)="cancelChangePassword()"
+            [disabled]="isLoading()"
+          >
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            class="save-button"
+            [disabled]="isLoading()"
+          >
+            @if (!isLoading()) {
+              <span>Cambiar Contraseña</span>
+            } @else {
+              <span>⏳ Guardando...</span>
+            }
+          </button>
+        </div>
+      </form>
+    }
+  </div>
+  </div>
+</div>

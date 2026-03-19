@@ -37,7 +37,7 @@ export class Login {
       if (this.username() === 'admin' && this.password() === 'admin123') {
         sessionStorage.setItem('usuario', this.username());
         console.log('✅ Login exitoso');
-        this.router.navigate(['']);
+        this.router.navigate(['overview']);
       } else {
         this.errorMessage.set('Usuario o contraseña incorrectos');
         console.log('❌ Login fallido');

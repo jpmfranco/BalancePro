@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import {
   ApexAxisChartSeries,
@@ -40,9 +40,9 @@ interface Movement {
 @Component({
   selector: 'app-proyeccion',
   standalone: true,
-  imports: [CommonModule, NgApexchartsModule],
-  templateUrl: './prediccion.html',
-  styleUrls: ['./prediccion.css']
+  imports: [CommonModule, NgApexchartsModule, RouterLink],
+  templateUrl: './proyeccion.html',
+  styleUrls: ['./proyeccion.css']
 })
 export class Proyeccion implements OnInit {
   menuOpen = signal(false);
@@ -80,36 +80,54 @@ export class Proyeccion implements OnInit {
       type: 'line',
       toolbar: {
         show: false
-      }
+      },
+      background: 'transparent'
     },
     dataLabels: {
       enabled: false
     },
     stroke: {
-      width: 2,
-      curve: 'smooth'
+      width: 4,
+      curve: 'smooth',
+      lineCap: 'round',
     },
-    colors: ['#2e7d32', '#c62828'],
+    colors: ['#22c55e', '#f87171'],
     xaxis: {
-      categories: ['Mes 1', 'Mes 2', 'Mes 3']
+      categories: ['Mes 1', 'Mes 2', 'Mes 3'],
+      labels: {
+        style: {
+          colors: '#ffffff',
+          fontSize: '12px'
+        }
+      },
+      axisBorder: {
+        color: 'white'
+      },
+      axisTicks: {
+        color: 'white'
+      }
     },
     yaxis: {
       min: 0,
       labels: {
+        style: {
+          colors: '#ffffff',
+          fontSize: '12px'
+        },
         formatter: (value) => {
           return '$' + value.toLocaleString();
         }
       }
     },
     legend: {
-      position: 'bottom'
+      position: 'bottom',
+      labels: {
+        colors: '#ffffff'
+      }
     },
     fill: {
-      type: 'gradient',
-      gradient: {
-        opacityFrom: 0.3,
-        opacityTo: 0.05
-      }
+      type: 'solid',
+      opacity: 0.5
     }
   };
 

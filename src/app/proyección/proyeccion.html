@@ -1,18 +1,33 @@
-<!-- Header -->
-<header class="header">
-  <div class="header-content">
-    <div class="logo">💰 Balance Pro</div>
-    <button class="mobile-menu-toggle" (click)="toggleMenu()">☰</button>
-    <ul class="nav-menu" [class.active]="menuOpen()">
-      <li><a href="javascript:void(0)" (click)="navigateTo('')">Overview</a></li>
-      <li><a href="javascript:void(0)" (click)="navigateTo('busqueda')">Búsqueda</a></li>
-      <li><a href="javascript:void(0)" class="active">Proyección</a></li>
-      <li><a href="javascript:void(0)" class="logout-btn" (click)="logout()">Cerrar sesión</a></li>
-    </ul>
+<!-- Sidebar -->
+<aside class="sidebar" [class.active]="menuOpen()">
+  <div class="sidebar-header">
+    <div class="logo">Balance Pro</div>
   </div>
-</header>
+  <nav class="sidebar-nav">
+    <a href="javascript:void(0)" routerLink="/overview" class="nav-item">
+      <span class="nav-text">Overview</span>
+    </a>
+    <a href="javascript:void(0)" routerLink="/busqueda" class="nav-item">
+      <span class="nav-text">Búsqueda</span>
+    </a>
+    <a href="javascript:void(0)" routerLink="/proyeccion" class="nav-item active">
+      <span class="nav-text">Proyeccion</span>
+    </a>
+    <a href="javascript:void(0)" routerLink="/perfil" class="nav-item">
+      <span class="nav-text">Perfil</span>
+    </a>
+    <a href="javascript:void(0)" (click)="logout()" class="nav-item logout">
+      <span class="nav-text">Cerrar sesión</span>
+    </a>
+  </nav>
+</aside>
 
-<div class="pred-container">
+<!-- Mobile Menu Toggle -->
+<button class="mobile-menu-toggle" (click)="toggleMenu()">Menu</button>
+
+<!-- Main Content -->
+<div class="main-content">
+  <div class="pred-container">
   <h2>Proyección financiera (Próximos 3 meses)</h2>
   
   <!-- Balances mensuales -->
@@ -60,7 +75,7 @@
         <tbody>
           @for (movement of movements; track movement.concepto) {
             <tr>
-              <td>{{ movement.concepto }}</td>
+              <td class="concept">{{ movement.concepto }}</td>
               <td [class.ingreso]="movement.tipo === 'Ingreso'" 
                   [class.egreso]="movement.tipo === 'Egreso'">
                 {{ movement.tipo }}
@@ -74,5 +89,6 @@
         </tbody>
       </table>
     </div>
+  </div>
   </div>
 </div>
