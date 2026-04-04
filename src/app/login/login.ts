@@ -1,7 +1,10 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../enviroment/enviroment';
+import { UsuarioService } from '../Services/usuario-service';
 
 @Component({
   selector: 'app-login',
@@ -10,32 +13,50 @@ import { Router } from '@angular/router';
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })
-export class Login {
-  username = signal('');
+export class Login implements OnInit{
+  apiU = environment.apiUsuario;
+  users:any = [];
+  correo = signal('');
   password = signal('');
   errorMessage = signal('');
   isLoading = signal(false);
 
-  constructor(private router: Router) {
+  constructor(private router: Router,private http:HttpClient, private usuarioService:UsuarioService) {
     const usuario = sessionStorage.getItem('usuario');
     if (usuario) {
       this.router.navigate(['/overview']);
     }
   }
 
+  ngOnInit(): void {
+    this.ObtenerUsuarios();
+  }
+  ObtenerUsuarios(){
+    this.usuarioService.getUsers().subscribe({
+      next:(res)=>{
+        this.users = res;
+        console.log(this.users);
+      }
+    });
+  }
   onSubmit(): void {
     this.errorMessage.set('');
     
-    if (!this.username().trim() || !this.password().trim()) {
+    if (!this.correo().trim() || !this.password().trim()) {
       this.errorMessage.set('Por favor, completa todos los campos');
       return;
     }
 
     this.isLoading.set(true);
-
     setTimeout(() => {
-      if (this.username() === 'admin' && this.password() === 'admin123') {
-        sessionStorage.setItem('usuario', this.username());
+      const json = {
+        correo: this.correo(),
+        contraseña: this.password()
+      }
+      console.log(json);
+      const filter = this.users.filter((f:any)=>f.correo = json.correo);
+      if(filter.length != 0){
+        sessionStorage.setItem('usuario', this.correo());
         console.log('✅ Login exitoso');
         this.router.navigate(['overview']);
       } else {
@@ -50,8 +71,8 @@ export class Login {
     this.errorMessage.set('');
   }
 
-  updateUsername(value: string): void {
-    this.username.set(value);
+  updatecorreo(value: string): void {
+    this.correo.set(value);
   }
 
   updatePassword(value: string): void {

@@ -39,7 +39,7 @@
   <!-- BALANCE -->
   <div class="balance-card">
     <span class="balance-label">Balance actual</span>
-    <span class="balance-amount">{{ formattedBalance() }}</span>
+    <span class="balance-amount">{{ "$"+balance()+".00" }}</span>
     <span class="balance-period">Últimos 7 días</span>
   </div>
   
@@ -134,13 +134,13 @@
 
         @if (errorMessage()) {
           <div class="error-message">
-            <span>⚠️ {{ errorMessage() }}</span>
+            <span> {{ errorMessage() }}</span>
           </div>
         }
 
         @if (successMessage()) {
           <div class="success-message">
-            <span>✅ {{ successMessage() }}</span>
+            <span> {{ successMessage() }}</span>
           </div>
         }
 
@@ -161,7 +161,7 @@
             @if (!isLoading()) {
               <span>Guardar Ingreso</span>
             } @else {
-              <span>⏳ Guardando...</span>
+              <span> Guardando...</span>
             }
           </button>
         </div>
@@ -241,13 +241,13 @@
 
         @if (errorMessage()) {
           <div class="error-message">
-            <span>⚠️ {{ errorMessage() }}</span>
+            <span> {{ errorMessage() }}</span>
           </div>
         }
 
         @if (successMessage()) {
           <div class="success-message">
-            <span>✅ {{ successMessage() }}</span>
+            <span> {{ successMessage() }}</span>
           </div>
         }
 
@@ -268,7 +268,7 @@
             @if (!isLoading()) {
               <span>Guardar Gasto</span>
             } @else {
-              <span>⏳ Guardando...</span>
+              <span> Guardando...</span>
             }
           </button>
         </div>

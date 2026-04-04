@@ -1,5 +1,5 @@
 import 'zone.js';
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { NgApexchartsModule } from 'ng-apexcharts';
@@ -17,6 +17,7 @@ import {
   ApexLegend,
   ApexFill
 } from 'ng-apexcharts';
+import { UsuarioService } from '../Services/usuario-service';
 
 interface Ingreso {
   descripcion: string;
@@ -55,9 +56,13 @@ export type ChartOptions = {
   styleUrls: ['./overview.css']
 })
 export class Overview implements OnInit {
-  balance = signal(12450.00);
+  balance = signal(0);
   menuOpen = signal(false);
   usuario = signal('');
+  gastosTotal:any = 0;
+  ingregosTotal:any = 0;
+  gastos:any = [];
+  ingresos:any = [];
 
   // Modales
   showIngresoModal = signal(false);
@@ -95,86 +100,61 @@ export class Overview implements OnInit {
     'Otros'
   ];
 
-  formattedBalance = computed(() =>
-    '$' + this.balance().toLocaleString('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    })
-  );
+  
 
   // Configuración de ApexCharts - SIN ERRORES
-  public chartOptions: Partial<ChartOptions> = {
+  chartOptions: Partial<ChartOptions> = this.getDefaultChartOptions([],[],['Lun','Mar','Mié','Jue','Vie','Sáb','Dom']);
+
+
+  constructor(private router: Router, private http: HttpClient,private usuarioService:UsuarioService,private cdr: ChangeDetectorRef) {}
+
+  ngOnInit(): void {
+    const usuario:any = sessionStorage.getItem('usuario');
+    if (!usuario) {
+      this.router.navigate(['/login']);
+    } else {
+      this.usuario.set(usuario);
+    }
+    this.cargarDatosUsuario(usuario);
+  }
+  getDefaultChartOptions(dataIngresos: number[], dataGastos: number[], labels: string[]): Partial<ChartOptions> {
+  return {
     series: [
-      {
-        name: 'Ingresos',
-        data: [1200, 800, 1500, 900, 2000, 500, 1000]
-      },
-      {
-        name: 'Egresos',
-        data: [600, 900, 700, 1100, 800, 400, 900]
-      }
+      { name: 'Ingresos', data: dataIngresos },
+      { name: 'Egresos', data: dataGastos }
     ],
     chart: {
       height: 400,
       type: 'line',
-      toolbar: {
-        show: false
-      },
-      zoom: {
-        enabled: false
-      }
+      toolbar: { show: false },
+      zoom: { enabled: false }
     },
-    dataLabels: {
-      enabled: false
-    },
-    stroke: {
-      width: 2,
-      curve: 'smooth'
-    },
+    dataLabels: { enabled: false },
+    stroke: { width: 2, curve: 'smooth' },
     colors: ['#5DADE2', '#EC7063'],
     markers: {
       size: 4,
       strokeColors: '#fff',
       strokeWidth: 2,
-      hover: {
-        size: 6
-      }
+      hover: { size: 6 }
     },
     xaxis: {
-      categories: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-      labels: {
-        style: {
-          colors: '#666',
-          fontSize: '11px'
-        }
-      }
+      categories: labels,
+      labels: { style: { colors: '#666', fontSize: '11px' } }
     },
     yaxis: {
       min: 0,
-      max: 2200,
-      tickAmount: 11,
       labels: {
-        style: {
-          colors: '#666',
-          fontSize: '11px'
-        },
-        formatter: (value) => {
-          return value.toLocaleString();
-        }
+        style: { colors: '#666', fontSize: '11px' },
+        formatter: (value) => value.toLocaleString()
       }
     },
-    grid: {
-      borderColor: 'rgba(0, 0, 0, 0.06)',
-      strokeDashArray: 0
-    },
+    grid: { borderColor: 'rgba(0,0,0,0.06)', strokeDashArray: 0 },
     legend: {
       position: 'bottom',
       horizontalAlign: 'center',
       fontSize: '12px',
-      itemMargin: {
-        horizontal: 15,
-        vertical: 5
-      }
+      itemMargin: { horizontal: 15, vertical: 5 }
     },
     fill: {
       type: 'gradient',
@@ -188,17 +168,88 @@ export class Overview implements OnInit {
       }
     }
   };
+}
+  cargarDatosUsuario(correo: string): void {
+  
+    this.cdr.detectChanges();
+    
+    this.usuarioService.getUsers().subscribe({
+      next: (res) => {
+        const usuarioEncontrado = res.find((u:any) => u.correo === correo);
+        if (usuarioEncontrado) {
+          this.usuario = usuarioEncontrado;
+        } else {
+          console.error('Usuario no encontrado con correo:', correo);
+        }
+        this.getBalance(this.usuario);
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error al obtener usuarios:', err);
+        this.cdr.detectChanges();
+      }
+    });
+  }
+  cargarDatosGrafica(idUsuario: number): void {
+    const hoy = new Date();
+    const ultimos7Dias = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(hoy);
+      d.setDate(hoy.getDate() - (6 - i));
+      return d.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+    });
 
-  constructor(private router: Router, private http: HttpClient) {}
+    const labels = ultimos7Dias.map(fecha =>
+      new Date(fecha).toLocaleDateString('es-MX', { weekday: 'short' })
+    );
 
-  ngOnInit(): void {
-    const usuario = sessionStorage.getItem('usuario');
-    if (!usuario) {
-      this.router.navigate(['/login']);
-    } else {
-      this.usuario.set(usuario);
-      console.log('✅ Overview cargado - Usuario:', usuario);
-    }
+    this.usuarioService.getGastosPorUsuario(idUsuario).subscribe({
+      next: (gastos: any[]) => {
+        this.usuarioService.getIngresosPorUsuario(idUsuario).subscribe({
+          next: (ingresos: any[]) => {
+
+            const dataGastos = ultimos7Dias.map(fecha =>
+              gastos
+                .filter(g => g.fecha.split('T')[0] === fecha)
+                .reduce((sum, g) => sum + g.monto, 0)
+            );
+            console.log(dataGastos);
+            
+
+            const dataIngresos = ultimos7Dias.map(fecha =>
+              ingresos
+                .filter(i => i.fecha.split('T')[0] === fecha)
+                .reduce((sum, i) => sum + i.monto, 0)
+            );
+            console.log(dataIngresos);
+            
+            this.chartOptions = this.getDefaultChartOptions(dataIngresos, dataGastos, labels);
+            this.cdr.detectChanges();
+          }
+        });
+      }
+    });
+  }
+  getBalance(id:any){
+    this.usuarioService.getGastosSuma(id.id).subscribe({
+      next:(res)=>{
+        this.gastosTotal = res.montoTotal;
+        this.usuarioService.getIngresosSuma(id.id).subscribe({
+      next:(res)=>{
+        this.ingregosTotal = res.montoTotal;
+        this.balance = signal(this.ingregosTotal-this.gastosTotal);
+        this.cdr.detectChanges();
+      },
+      error:(error)=>{
+
+      }
+    });
+        this.cdr.detectChanges();
+      },
+      error:(error)=>{
+
+      }
+    });
+    this.cargarDatosGrafica(id.id);
   }
 
   toggleMenu(): void {

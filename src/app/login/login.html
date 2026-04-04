@@ -8,15 +8,15 @@
     <form (ngSubmit)="onSubmit()" class="login-form">
       <!-- Usuario -->
       <div class="form-group">
-        <label for="username">Usuario</label>
+        <label for="username">Correo</label>
         <input
           type="text"
           id="username"
           name="username"
-          [value]="username()"
-          (input)="updateUsername($any($event.target).value)"
+          [value]="correo()"
+          (input)="updatecorreo($any($event.target).value)"
           (focus)="clearError()"
-          placeholder="Ingresa tu usuario"
+          placeholder="Ingresa tu correo"
           [disabled]="isLoading()"
           autocomplete="username"
           required

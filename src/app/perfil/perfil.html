@@ -1,5 +1,5 @@
 <!-- Sidebar -->
-<aside class="sidebar" [class.active]="menuOpen()">
+<aside class="sidebar" [class.active]="menuOpen">
   <div class="sidebar-header">
     <div class="logo">Balance Pro</div>
   </div>
@@ -31,13 +31,13 @@
   <!-- Cabecera del perfil -->
   <div class="profile-header">
     <div class="avatar">
-      {{ usuario().nombre.charAt(0).toUpperCase() }}
+      {{ usuario.nombre.charAt(0).toUpperCase() }}
     </div>
     <div class="profile-info">
-      <h1>{{ usuario().nombre }}</h1>
-      <p>{{ usuario().correo }}</p>
-      <span class="badge" [class.active]="usuario().activo" [class.inactive]="!usuario().activo">
-        {{ usuario().activo ? '✓ Activo' : '✗ Inactivo' }}
+      <h1>{{ usuario.nombre }}</h1>
+      <p>{{ usuario.correo }}</p>
+      <span class="badge" [class.active]="usuario.activo" [class.inactive]="!usuario.activo">
+        {{ usuario.activo ? '✓ Activo' : '✗ Inactivo' }}
       </span>
     </div>
   </div>
@@ -47,28 +47,28 @@
     <div class="stat-card ingreso">
       <div class="stat-info">
         <span class="stat-label">Total Ingresos</span>
-        <span class="stat-value">{{ formatCurrency(estadisticas().totalIngresos) }}</span>
+        <span class="stat-value">{{ formatCurrency(estadisticas.totalIngresos) }}</span>
       </div>
     </div>
 
     <div class="stat-card egreso">
       <div class="stat-info">
         <span class="stat-label">Total Gastos</span>
-        <span class="stat-value">{{ formatCurrency(estadisticas().totalGastos) }}</span>
+        <span class="stat-value">{{ formatCurrency(estadisticas.totalGastos) }}</span>
       </div>
     </div>
 
     <div class="stat-card balance">
       <div class="stat-info">
         <span class="stat-label">Balance</span>
-        <span class="stat-value">{{ formatCurrency(estadisticas().balance) }}</span>
+        <span class="stat-value">{{ formatCurrency(estadisticas.balance) }}</span>
       </div>
     </div>
 
     <div class="stat-card transacciones">
       <div class="stat-info">
         <span class="stat-label">Transacciones</span>
-        <span class="stat-value">{{ estadisticas().totalTransacciones }}</span>
+        <span class="stat-value">{{ estadisticas.totalTransacciones }}</span>
       </div>
     </div>
   </div>
@@ -77,79 +77,79 @@
   <div class="profile-section">
     <div class="section-header">
       <h2>Información Personal</h2>
-      @if (!isEditing() && !isChangingPassword()) {
-        <button class="edit-btn" (click)="startEdit()">✏️ Editar</button>
+      @if (!isEditing && !isChangingPassword) {
+        <button class="edit-btn" (click)="startEdit()"> Editar</button>
       }
     </div>
 
     <!-- Mensajes -->
-    @if (errorMessage()) {
+    @if (errorMessage) {
       <div class="error-message">
-        <span>⚠️ {{ errorMessage() }}</span>
+        <span> {{ errorMessage }}</span>
       </div>
     }
 
-    @if (successMessage()) {
+    @if (successMessage) {
       <div class="success-message">
-        <span>✅ {{ successMessage() }}</span>
+        <span> {{ successMessage }}</span>
       </div>
     }
 
     <!-- Modo vista -->
-    @if (!isEditing() && !isChangingPassword()) {
+    @if (!isEditing && !isChangingPassword) {
       <div class="info-grid">
         <div class="info-item">
           <span class="info-label">Nombre</span>
-          <span class="info-value">{{ usuario().nombre }}</span>
+          <span class="info-value">{{ usuario.nombre }}</span>
         </div>
 
         <div class="info-item">
           <span class="info-label">Género</span>
-          <span class="info-value">{{ usuario().genero || 'No especificado' }}</span>
+          <span class="info-value">{{ usuario.genero || 'No especificado' }}</span>
         </div>
 
         <div class="info-item">
           <span class="info-label">Edad</span>
-          <span class="info-value">{{ usuario().edad || 'No especificada' }} años</span>
+          <span class="info-value">{{ usuario.edad || 'No especificada' }} años</span>
         </div>
 
         <div class="info-item">
           <span class="info-label">Correo</span>
-          <span class="info-value">{{ usuario().correo }}</span>
+          <span class="info-value">{{ usuario.correo }}</span>
         </div>
 
         <div class="info-item">
           <span class="info-label">Celular</span>
-          <span class="info-value">{{ usuario().celular || 'No especificado' }}</span>
+          <span class="info-value">{{ usuario.celular || 'No especificado' }}</span>
         </div>
 
         <div class="info-item">
           <span class="info-label">Miembro desde</span>
-          <span class="info-value">{{ usuario().fechaRegistro }} ({{ diasRegistrado() }} días)</span>
+          <span class="info-value">{{ usuario.fechaRegistro }} ({{ diasRegistrado }} días)</span>
         </div>
       </div>
 
       <div class="action-buttons">
         <button class="password-btn" (click)="openChangePassword()">
-          🔒 Cambiar Contraseña
+          Cambiar Contraseña
         </button>
         <button class="deactivate-btn" (click)="deactivateAccount()">
-          ⚠️ Desactivar Cuenta
+          Desactivar Cuenta
         </button>
       </div>
     }
 
     <!-- Modo edición -->
-    @if (isEditing()) {
+    @if (isEditing) {
       <form (ngSubmit)="saveProfile()" class="edit-form">
         <div class="form-group">
           <label for="nombre">Nombre *</label>
           <input
             type="text"
             id="nombre"
-            [value]="usuarioEdit().nombre"
+            [value]="usuarioEdit.nombre"
             (input)="updateEditField('nombre', $any($event.target).value)"
-            [disabled]="isLoading()"
+            [disabled]="isLoading"
             required
           />
         </div>
@@ -158,9 +158,9 @@
           <label for="genero">Género</label>
           <select
             id="genero"
-            [value]="usuarioEdit().genero"
+            [value]="usuarioEdit.genero"
             (change)="updateEditField('genero', $any($event.target).value)"
-            [disabled]="isLoading()"
+            [disabled]="isLoading"
           >
             <option value="">Selecciona...</option>
             <option value="Masculino">Masculino</option>
@@ -175,11 +175,11 @@
           <input
             type="number"
             id="edad"
-            [value]="usuarioEdit().edad"
+            [value]="usuarioEdit.edad"
             (input)="updateEditField('edad', +$any($event.target).value)"
             min="18"
             max="120"
-            [disabled]="isLoading()"
+            [disabled]="isLoading"
           />
         </div>
 
@@ -188,9 +188,9 @@
           <input
             type="email"
             id="correo"
-            [value]="usuarioEdit().correo"
+            [value]="usuarioEdit.correo"
             (input)="updateEditField('correo', $any($event.target).value)"
-            [disabled]="isLoading()"
+            [disabled]="isLoading"
             required
           />
         </div>
@@ -200,30 +200,30 @@
           <input
             type="tel"
             id="celular"
-            [value]="usuarioEdit().celular"
+            [value]="usuarioEdit.celular"
             (input)="updateEditField('celular', $any($event.target).value)"
-            [disabled]="isLoading()"
+            [disabled]="isLoading"
           />
         </div>
 
         <div class="form-actions">
-          <button 
-            type="button" 
+          <button
+            type="button"
             class="cancel-button"
             (click)="cancelEdit()"
-            [disabled]="isLoading()"
+            [disabled]="isLoading"
           >
             Cancelar
           </button>
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             class="save-button"
-            [disabled]="isLoading()"
+            [disabled]="isLoading"
           >
-            @if (!isLoading()) {
+            @if (!isLoading) {
               <span>Guardar Cambios</span>
             } @else {
-              <span>⏳ Guardando...</span>
+              <span> Guardando...</span>
             }
           </button>
         </div>
@@ -231,17 +231,17 @@
     }
 
     <!-- Cambiar contraseña -->
-    @if (isChangingPassword()) {
+    @if (isChangingPassword) {
       <form (ngSubmit)="savePassword()" class="password-form">
         <div class="form-group">
           <label for="contraseñaActual">Contraseña Actual *</label>
           <input
             type="password"
             id="contraseñaActual"
-            [value]="contrasenaActual()"
-            (input)="contrasenaActual.set($any($event.target).value)"
+            name="actual"
+            [(ngModel)]="contrasenaActual"
             placeholder="Ingresa tu contraseña actual"
-            [disabled]="isLoading()"
+            [disabled]="isLoading"
             required
           />
         </div>
@@ -251,10 +251,10 @@
           <input
             type="password"
             id="contraseñaNueva"
-            [value]="contrasenaNueva()"
-            (input)="contrasenaNueva.set($any($event.target).value)"
+            name="new"
+            [(ngModel)]="contrasenaNueva"
             placeholder="Mínimo 6 caracteres"
-            [disabled]="isLoading()"
+            [disabled]="isLoading"
             required
           />
         </div>
@@ -264,32 +264,32 @@
           <input
             type="password"
             id="confirmarContraseña"
-            [value]="confirmarContrasena()"
-            (input)="confirmarContrasena.set($any($event.target).value)"
+            name="confir"
+            [(ngModel)]="confirmarContrasena"
             placeholder="Repite tu nueva contraseña"
-            [disabled]="isLoading()"
+            [disabled]="isLoading"
             required
           />
         </div>
 
         <div class="form-actions">
-          <button 
-            type="button" 
+          <button
+            type="button"
             class="cancel-button"
             (click)="cancelChangePassword()"
-            [disabled]="isLoading()"
+            [disabled]="isLoading"
           >
             Cancelar
           </button>
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             class="save-button"
-            [disabled]="isLoading()"
+            [disabled]="isLoading"
           >
-            @if (!isLoading()) {
+            @if (!isLoading) {
               <span>Cambiar Contraseña</span>
             } @else {
-              <span>⏳ Guardando...</span>
+              <span> Guardando...</span>
             }
           </button>
         </div>
