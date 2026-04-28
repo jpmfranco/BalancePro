@@ -57,7 +57,8 @@
   </div>
   
   <!-- GRÁFICA CON APEXCHARTS -->
-  <div class="chart-card">
+   @if(chartListo){
+    <div class="chart-card">
     <h3>Movimientos últimos 7 días</h3>
     <div class="chart-wrapper">
       <apx-chart
@@ -76,28 +77,30 @@
     </div>
     
   </div>
+   }
+  
   </div>
 </div>
 
 <!-- Modal de Ingreso -->
-@if (showIngresoModal()) {
-  <div class="modal-backdrop" (click)="closeIngresoModal()">
-    <div class="modal-content-ingreso" (click)="$event.stopPropagation()">
+@if (showIngresoModal) {
+  <div class="modal-backdrop">
+    <div class="modal-content-ingreso" >
       <div class="modal-header">
         <h2> Registrar Ingreso</h2>
-        <button class="close-btn" (click)="closeIngresoModal()">✕</button>
+        <button class="close-btn" >✕</button>
       </div>
 
-      <form (ngSubmit)="onSubmitIngreso()" class="modal-form">
+      <form action="POST" (submit)="onSubmitIngreso()" class="modal-form">
         <div class="form-group">
           <label for="ingreso-descripcion">Descripción *</label>
           <input
             type="text"
             id="ingreso-descripcion"
-            [value]="ingreso().descripcion"
+            [value]="ingreso().descripcion.toString()"
             (input)="updateIngresoField('descripcion', $any($event.target).value)"
             placeholder="Ej: Salario mensual, Venta producto, etc."
-            [disabled]="isLoading()"
+            [disabled]="isLoading"
             required
           />
         </div>
@@ -109,7 +112,7 @@
             id="ingreso-fecha"
             [value]="ingreso().fecha"
             (input)="updateIngresoField('fecha', $any($event.target).value)"
-            [disabled]="isLoading()"
+            [disabled]="isLoading"
             required
           />
         </div>
@@ -126,7 +129,7 @@
               placeholder="0.00"
               step="0.01"
               min="0"
-              [disabled]="isLoading()"
+              [disabled]="isLoading"
               required
             />
           </div>
@@ -149,16 +152,16 @@
             type="button"
             class="cancel-button"
             (click)="closeIngresoModal()"
-            [disabled]="isLoading()"
+            [disabled]="isLoading"
           >
             Cancelar
           </button>
           <button
             type="submit"
             class="submit-button"
-            [disabled]="isLoading()"
+            [disabled]="isLoading"
           >
-            @if (!isLoading()) {
+            @if (!isLoading) {
               <span>Guardar Ingreso</span>
             } @else {
               <span> Guardando...</span>
@@ -171,15 +174,15 @@
 }
 
 <!-- Modal de Gasto -->
-@if (showGastoModal()) {
-  <div class="modal-backdrop" (click)="closeGastoModal()">
-    <div class="modal-content-gasto" (click)="$event.stopPropagation()">
+@if (showGastoModal) {
+  <div class="modal-backdrop" >
+    <div class="modal-content-gasto" >
       <div class="modal-header">
         <h2> Registrar Gasto</h2>
-        <button class="close-btn" (click)="closeGastoModal()">✕</button>
+        <button class="close-btn" >✕</button>
       </div>
 
-      <form (ngSubmit)="onSubmitGasto()" class="modal-form">
+      <form action="POST" (submit)="onSubmitGasto()" class="modal-form">
         <div class="form-group">
           <label for="gasto-descripcion">Descripción *</label>
           <input
@@ -188,7 +191,7 @@
             [value]="gasto().descripcion"
             (input)="updateGastoField('descripcion', $any($event.target).value)"
             placeholder="Ej: Compra supermercado, Pago renta, etc."
-            [disabled]="isLoading()"
+            [disabled]="isLoading"
             required
           />
         </div>
@@ -200,7 +203,7 @@
             id="gasto-fecha"
             [value]="gasto().fecha"
             (input)="updateGastoField('fecha', $any($event.target).value)"
-            [disabled]="isLoading()"
+            [disabled]="isLoading"
             required
           />
         </div>
@@ -211,7 +214,7 @@
             id="gasto-categoria"
             [value]="gasto().categoria"
             (change)="updateGastoField('categoria', $any($event.target).value)"
-            [disabled]="isLoading()"
+            [disabled]="isLoading"
             required
           >
             <option value="">Selecciona una categoría...</option>
@@ -233,7 +236,7 @@
               placeholder="0.00"
               step="0.01"
               min="0"
-              [disabled]="isLoading()"
+              [disabled]="isLoading"
               required
             />
           </div>
@@ -256,16 +259,16 @@
             type="button"
             class="cancel-button"
             (click)="closeGastoModal()"
-            [disabled]="isLoading()"
+            [disabled]="isLoading"
           >
             Cancelar
           </button>
           <button
             type="submit"
             class="submit-button"
-            [disabled]="isLoading()"
+            [disabled]="isLoading"
           >
-            @if (!isLoading()) {
+            @if (!isLoading) {
               <span>Guardar Gasto</span>
             } @else {
               <span> Guardando...</span>

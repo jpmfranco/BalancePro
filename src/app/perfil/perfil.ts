@@ -123,7 +123,6 @@ export class Perfil implements OnInit {
         console.error('Error al cargar gastos:', err);
       }
     });
-    console.log(user.id,"sad");
     
     
   }
@@ -137,7 +136,6 @@ export class Perfil implements OnInit {
         if (usuarioEncontrado) {
           this.usuario = usuarioEncontrado;
           this.usuarioEdit = { ...usuarioEncontrado };
-          console.log('Usuario cargado:', usuarioEncontrado);
         } else {
           this.errorMessage = 'No se encontró el usuario';
           console.error('Usuario no encontrado con correo:', correo);

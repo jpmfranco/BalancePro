@@ -1,5 +1,5 @@
 export const environment = {
-        apiGasto: 'http://localhost:7252/api/Gastoes/',
-        apiIngreso: 'http://localhost:7252/api/Ingresoes/',
-        apiUsuario: 'http://localhost:7252/api/Usuarios/'
+        apiGasto: 'http://localhost:5293/api/Gastoes/',
+        apiIngreso: 'http://localhost:5293/api/Ingresoes/',
+        apiUsuario: 'http://localhost:5293/api/Usuarios/'
 };

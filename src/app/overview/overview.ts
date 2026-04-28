@@ -56,18 +56,22 @@ export type ChartOptions = {
   styleUrls: ['./overview.css']
 })
 export class Overview implements OnInit {
+  apiI = environment.apiIngreso;
+  apiG = environment.apiGasto;
   balance = signal(0);
   menuOpen = signal(false);
   usuario = signal('');
+  private idUsuario:number = 0;
   gastosTotal:any = 0;
   ingregosTotal:any = 0;
   gastos:any = [];
   ingresos:any = [];
+  chartListo: boolean = false;
 
   // Modales
-  showIngresoModal = signal(false);
-  showGastoModal = signal(false);
-  isLoading = signal(false);
+  showIngresoModal:boolean = false;
+  showGastoModal:boolean = false;
+  isLoading:boolean = false
   errorMessage = signal('');
   successMessage = signal('');
 
@@ -170,87 +174,79 @@ export class Overview implements OnInit {
   };
 }
   cargarDatosUsuario(correo: string): void {
-  
-    this.cdr.detectChanges();
-    
-    this.usuarioService.getUsers().subscribe({
-      next: (res) => {
-        const usuarioEncontrado = res.find((u:any) => u.correo === correo);
-        if (usuarioEncontrado) {
-          this.usuario = usuarioEncontrado;
-        } else {
-          console.error('Usuario no encontrado con correo:', correo);
-        }
-        this.getBalance(this.usuario);
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Error al obtener usuarios:', err);
+  this.usuarioService.getUsers().subscribe({
+    next: (res) => {
+      const usuarioEncontrado = res.find((u: any) => u.correo === correo);
+      if (usuarioEncontrado) {
+        this.usuario = usuarioEncontrado;
+        this.idUsuario = usuarioEncontrado.id;
+
+        // ✅ Solo una llamada aquí, elimina la de getBalance
+        this.cargarDatosGrafica(this.idUsuario);
+        this.getBalance(usuarioEncontrado); // ✅ pasa el objeto directo
         this.cdr.detectChanges();
       }
-    });
-  }
+    },
+    error: (err) => console.error(err)
+  });
+}
   cargarDatosGrafica(idUsuario: number): void {
-    const hoy = new Date();
-    const ultimos7Dias = Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(hoy);
-      d.setDate(hoy.getDate() - (6 - i));
-      return d.toISOString().split('T')[0]; // 'YYYY-MM-DD'
-    });
+  const hoy = new Date();
+  const ultimos7Dias = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(hoy);
+    d.setDate(hoy.getDate() - (6 - i));
+    return d.toISOString().split('T')[0];
+  });
 
-    const labels = ultimos7Dias.map(fecha =>
-      new Date(fecha).toLocaleDateString('es-MX', { weekday: 'short' })
-    );
+  const labels = ultimos7Dias.map(fecha =>
+    new Date(fecha + 'T12:00:00').toLocaleDateString('es-MX', { weekday: 'short' })
+  );
 
-    this.usuarioService.getGastosPorUsuario(idUsuario).subscribe({
-      next: (gastos: any[]) => {
-        this.usuarioService.getIngresosPorUsuario(idUsuario).subscribe({
-          next: (ingresos: any[]) => {
+  this.usuarioService.getGastos().subscribe({
+    next: (gastos: any[]) => {
+      this.usuarioService.getGIngresos().subscribe({
+        next: (ingresos: any[]) => {
 
-            const dataGastos = ultimos7Dias.map(fecha =>
-              gastos
-                .filter(g => g.fecha.split('T')[0] === fecha)
-                .reduce((sum, g) => sum + g.monto, 0)
-            );
-            console.log(dataGastos);
-            
+          const dataGastos = ultimos7Dias.map(fecha =>
+            gastos
+              .filter(g => g.fecha.split('T')[0] === fecha && g.idUsuario === idUsuario)
+              .reduce((sum, g) => sum + g.monto, 0)
+          );
 
-            const dataIngresos = ultimos7Dias.map(fecha =>
-              ingresos
-                .filter(i => i.fecha.split('T')[0] === fecha)
-                .reduce((sum, i) => sum + i.monto, 0)
-            );
-            console.log(dataIngresos);
-            
-            this.chartOptions = this.getDefaultChartOptions(dataIngresos, dataGastos, labels);
+          const dataIngresos = ultimos7Dias.map(fecha =>
+            ingresos
+              .filter(i => i.fecha.split('T')[0] === fecha && i.idUsuario === idUsuario)
+              .reduce((sum, i) => sum + i.monto, 0)
+          );
+
+          
+          this.chartOptions = this.getDefaultChartOptions(dataIngresos, dataGastos, labels);
+          this.chartListo = false; 
+          // ✅ detectChanges después de actualizar el chart
+          setTimeout(() => {
+            this.chartListo = true; // fuerza re-render
             this.cdr.detectChanges();
-          }
-        });
-      }
-    });
-  }
-  getBalance(id:any){
-    this.usuarioService.getGastosSuma(id.id).subscribe({
-      next:(res)=>{
-        this.gastosTotal = res.montoTotal;
-        this.usuarioService.getIngresosSuma(id.id).subscribe({
-      next:(res)=>{
-        this.ingregosTotal = res.montoTotal;
-        this.balance = signal(this.ingregosTotal-this.gastosTotal);
-        this.cdr.detectChanges();
-      },
-      error:(error)=>{
-
-      }
-    });
-        this.cdr.detectChanges();
-      },
-      error:(error)=>{
-
-      }
-    });
-    this.cargarDatosGrafica(id.id);
-  }
+          }, 50);
+        }
+      });
+    }
+  });
+}
+  getBalance(id: any) {
+  this.usuarioService.getGastosSuma(id.id).subscribe({
+    next: (res) => {
+      this.gastosTotal = res.montoTotal;
+      this.usuarioService.getIngresosSuma(id.id).subscribe({
+        next: (res) => {
+          this.ingregosTotal = res.montoTotal;
+          this.balance = signal(this.ingregosTotal - this.gastosTotal);
+          this.cdr.detectChanges();
+        }
+      });
+    }
+  });
+  // ✅ Elimina el cargarDatosGrafica de aquí
+}
 
   toggleMenu(): void {
     this.menuOpen.update(value => !value);
@@ -273,13 +269,13 @@ export class Overview implements OnInit {
 
   // Métodos para Modal de Ingreso
   openIngresoModal(): void {
-    this.showIngresoModal.set(true);
+    this.showIngresoModal = true;
     this.errorMessage.set('');
     this.successMessage.set('');
   }
 
   closeIngresoModal(): void {
-    this.showIngresoModal.set(false);
+    this.showIngresoModal = false;
     this.ingreso.set({
       descripcion: '',
       fecha: new Date().toISOString().split('T')[0],
@@ -300,34 +296,54 @@ export class Overview implements OnInit {
 
     const ing = this.ingreso();
 
+
     if (!ing.descripcion || !ing.fecha || ing.monto <= 0) {
       this.errorMessage.set('Por favor, completa todos los campos correctamente');
       return;
     }
+    
+    this.isLoading = true;
+    const payload = {
+      descripcion: ing.descripcion,
+      fecha: new Date(ing.fecha).toISOString(),
+      monto: ing.monto,
+      idUsuario: this.idUsuario
+    };
+    console.log(payload);
+    this.http.post(this.apiI+"CrearIngreso",payload).subscribe({
+      next:(res)=>{
+        setTimeout(() => {
+        this.successMessage.set('¡Ingreso registrado exitosamente!'+res);
+        this.isLoading = false;
 
-    this.isLoading.set(true);
-
-    // Simular guardado (aquí iría tu llamada al API)
-    setTimeout(() => {
-      console.log('Ingreso registrado:', this.ingreso());
-      this.successMessage.set('¡Ingreso registrado exitosamente!');
-      this.isLoading.set(false);
-
+      // Limpiar formulario
       setTimeout(() => {
-        this.closeIngresoModal();
-      }, 1500);
-    }, 1000);
+        this.ingreso.set({
+          descripcion: '',
+          fecha: new Date().toISOString().split('T')[0],
+          monto: 0,
+          idUsuario: 1
+        });
+        this.successMessage.set('');
+      }, 2000);
+    }, 3000);
+    this.cdr.detectChanges();
+      },
+      error:(err)=>{
+        console.log(err);
+      }
+    })
   }
 
   // Métodos para Modal de Gasto
   openGastoModal(): void {
-    this.showGastoModal.set(true);
+    this.showGastoModal = true;
     this.errorMessage.set('');
     this.successMessage.set('');
   }
 
   closeGastoModal(): void {
-    this.showGastoModal.set(false);
+    this.showGastoModal = false;
     this.gasto.set({
       descripcion: '',
       fecha: new Date().toISOString().split('T')[0],
@@ -344,6 +360,7 @@ export class Overview implements OnInit {
   }
 
   onSubmitGasto(): void {
+    console.log("prueba que funciona");
     this.errorMessage.set('');
     this.successMessage.set('');
 
@@ -354,32 +371,38 @@ export class Overview implements OnInit {
       return;
     }
 
-    this.isLoading.set(true);
+    this.isLoading = true;
 
     const payload = {
       descripcion: gas.descripcion,
       categoria: gas.categoria,
       fecha: new Date(gas.fecha).toISOString(),
       monto: gas.monto,
-      idUsuario: gas.idUsuario
+      idUsuario: this.idUsuario
     };
 
-    this.http.post(`${environment.apiGasto}/CrearGasto`, payload).subscribe({
-      next: (response) => {
-        console.log('Gasto registrado:', response);
-        this.successMessage.set('¡Gasto registrado exitosamente!');
-        this.isLoading.set(false);
-
+    this.http.post(this.apiG+"CrearGasto", payload).subscribe({
+      next:(res)=>{
         setTimeout(() => {
-          this.closeGastoModal();
-        }, 1500);
+        this.successMessage.set('¡Gasto registrado exitosamente!'+res);
+        this.isLoading = false;
+
+      // Limpiar formulario
+      setTimeout(() => {
+        this.gasto.set({
+          descripcion: '',
+          fecha: new Date().toISOString().split('T')[0],
+          categoria:'',
+          monto: 0,
+          idUsuario: 1
+        });
+        this.successMessage.set('');
+      }, 2000);
+    }, 3000);
+    this.cdr.detectChanges();
       },
-      error: (error) => {
-        console.error('Error al registrar gasto:', error);
-        this.errorMessage.set(
-          error.error?.message || 'Error al guardar el gasto. Intenta nuevamente.'
-        );
-        this.isLoading.set(false);
+      error:(err)=>{
+        console.log(err);
       }
     });
   }

@@ -88,7 +88,7 @@
           </td>
         </tr>
       }
-      @for (transaction of filteredTransactions(); track transaction.fecha + transaction.nombre) {
+      @for (transaction of filteredTransactions(); track $index) {
         <tr>
           <td>{{ transaction.fecha.split("T")[0] }}</td>
           <td>{{ transaction.nombre }}</td>
@@ -100,29 +100,25 @@
           </td>
           <td>
             <button class="detail-btn" (click)="viewDetails(transaction)">Ver</button>
-            @if(ismodale){
-              <!-- Modal -->
-            <div class="modal-overlay" *ngIf="selectedTransaction" (click)="closeModal()">
-              <div class="modal-content" (click)="$event.stopPropagation()">
-                <h2>Detalles de Transacción</h2>
-                
-                <div class="modal-body">
-                  <p><strong>Fecha:</strong> {{ selectedTransaction.fecha }}</p>
-                  <p><strong>Nombre:</strong> {{ selectedTransaction.nombre }}</p>
-                  <p><strong>Tipo:</strong> {{ selectedTransaction.tipo }}</p>
-                  <p><strong>Monto:</strong> {{ formatCurrency(selectedTransaction.monto) }}</p>
-                </div>
-
-                <button class="detail-btn" (click)="closeModal()">Cerrar</button>
-              </div>
-            </div>
-            }
           </td>
         </tr>
       }
     </tbody>
   </table>
-  
+  @if (ismodale) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h2>Detalles de Transacción</h2>
+      <div class="modal-body">
+        <p><strong>Fecha:</strong> {{ selectedTransaction?.fecha }}</p>
+        <p><strong>Nombre:</strong> {{ selectedTransaction?.nombre }}</p>
+        <p><strong>Tipo:</strong> {{ selectedTransaction?.tipo }}</p>
+        <p><strong>Monto:</strong> {{ selectedTransaction ? formatCurrency(selectedTransaction.monto) : '' }}</p>
+      </div>
+      <button class="detail-btn" (click)="closeModal()">Cerrar</button>
+    </div>
+  </div>
+}
   <!-- Contador de resultados -->
   <div class="results-count">
     Mostrando {{ filteredTransactions().length }} de {{ allTransactions().length }} movimientos

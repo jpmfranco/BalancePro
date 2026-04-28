@@ -35,7 +35,6 @@ export class Login implements OnInit{
     this.usuarioService.getUsers().subscribe({
       next:(res)=>{
         this.users = res;
-        console.log(this.users);
       }
     });
   }
@@ -57,11 +56,9 @@ export class Login implements OnInit{
       const filter = this.users.filter((f:any)=>f.correo = json.correo);
       if(filter.length != 0){
         sessionStorage.setItem('usuario', this.correo());
-        console.log('✅ Login exitoso');
         this.router.navigate(['overview']);
       } else {
         this.errorMessage.set('Usuario o contraseña incorrectos');
-        console.log('❌ Login fallido');
       }
       this.isLoading.set(false);
     }, 1000);

@@ -112,7 +112,6 @@ export class Busqueda implements OnInit {
         });
 
         this.allTransactions.set(transactions);
-        console.log('Transacciones cargadas:', this.allTransactions());
       },
       error: (err) => {
         console.error('Error al cargar transacciones:', err);
