@@ -6,5 +6,7 @@ COPY . .
 RUN npm run build -- --configuration production
 
 FROM nginx:alpine
+# ✅ Copia tu configuración personalizada
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist/AppEcono/browser /usr/share/nginx/html
 EXPOSE 80

@@ -1,5 +1,22 @@
+body{
+  background: #1a1a1a;
+}
+:host{
+  width: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+    background: #1a1a1a;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 .login-container {
-  min-height: 100vh;
+  margin: 0;
+  left: 0;
+  right: 0;
+  top: 100px;
+  position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;

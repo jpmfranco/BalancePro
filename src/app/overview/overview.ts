@@ -254,7 +254,6 @@ export class Overview implements OnInit {
 
   logout(): void {
     sessionStorage.removeItem('usuario');
-    this.usuario.set('');
     this.router.navigate(['/login']);
   }
 
