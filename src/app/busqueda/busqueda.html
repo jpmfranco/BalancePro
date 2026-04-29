@@ -105,7 +105,7 @@
       }
     </tbody>
   </table>
-  @if (ismodale) {
+  @if (ismodale()) {
   <div class="modal-overlay" (click)="closeModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <h2>Detalles de Transacción</h2>

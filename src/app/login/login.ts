@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../enviroment/enviroment';
 import { UsuarioService } from '../Services/usuario-service';
@@ -9,7 +9,7 @@ import { UsuarioService } from '../Services/usuario-service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })
@@ -63,7 +63,9 @@ export class Login implements OnInit{
       this.isLoading.set(false);
     }, 1000);
   }
-
+  GotoRegister(){
+    this.router.navigate(['registro']);
+  }
   clearError(): void {
     this.errorMessage.set('');
   }

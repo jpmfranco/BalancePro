@@ -1,7 +1,7 @@
 <div class="registro-container">
   <div class="registro-card">
     <div class="registro-header">
-      <div class="logo">💰</div>
+      <div class="logo"></div>
       <h1>Balance Pro</h1>
       <p>Crea tu cuenta gratis</p>
     </div>
@@ -111,14 +111,14 @@
       <!-- Mensaje de error -->
       @if (errorMessage()) {
         <div class="error-message">
-          <span>⚠️ {{ errorMessage() }}</span>
+          <span> {{ errorMessage() }}</span>
         </div>
       }
 
       <!-- Mensaje de éxito -->
       @if (successMessage()) {
         <div class="success-message">
-          <span>✅ {{ successMessage() }}</span>
+          <span> {{ successMessage() }}</span>
         </div>
       }
 
@@ -131,7 +131,7 @@
         @if (!isLoading()) {
           <span>Crear cuenta</span>
         } @else {
-          <span class="loading-spinner">⏳ Registrando...</span>
+          <span class="loading-spinner">Registrando...</span>
         }
       </button>
     </form>

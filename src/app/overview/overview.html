@@ -83,12 +83,12 @@
 </div>
 
 <!-- Modal de Ingreso -->
-@if (showIngresoModal) {
+@if (showIngresoModal()) {
   <div class="modal-backdrop">
     <div class="modal-content-ingreso" >
       <div class="modal-header">
         <h2> Registrar Ingreso</h2>
-        <button class="close-btn" >✕</button>
+        <button class="close-btn" (click)="closeIngresoModal()">✕</button>
       </div>
 
       <form action="POST" (submit)="onSubmitIngreso()" class="modal-form">
@@ -174,12 +174,12 @@
 }
 
 <!-- Modal de Gasto -->
-@if (showGastoModal) {
+@if (showGastoModal()) {
   <div class="modal-backdrop" >
     <div class="modal-content-gasto" >
       <div class="modal-header">
         <h2> Registrar Gasto</h2>
-        <button class="close-btn" >✕</button>
+        <button class="close-btn" (click)="closeGastoModal()">✕</button>
       </div>
 
       <form action="POST" (submit)="onSubmitGasto()" class="modal-form">

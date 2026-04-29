@@ -2,6 +2,8 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../enviroment/enviroment';
 
 interface UsuarioRegistro {
   nombre: string;
@@ -11,6 +13,17 @@ interface UsuarioRegistro {
   celular: string;
   contrasena: string;
   confirmarContrasena: string;
+}
+
+interface UsuarioAPI {
+  nombre: string;
+  edad: number;
+  genero: string;
+  correo: string;
+  celular: number;
+  contrasena: string;
+  fechaRegistro: string;
+  activo: boolean;
 }
 
 @Component({
@@ -35,7 +48,7 @@ export class Registro {
   successMessage = signal('');
   isLoading = signal(false);
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private http: HttpClient) {}
 
   updateField(field: keyof UsuarioRegistro, value: any): void {
     this.usuario.update(u => ({ ...u, [field]: value }));
@@ -69,19 +82,38 @@ export class Registro {
       return;
     }
 
+    if (u.celular && !/^\d{10}$/.test(u.celular.toString())) {
+      this.errorMessage.set('El número de celular debe tener exactamente 10 dígitos');
+      return;
+    }
+
     this.isLoading.set(true);
 
-    // Simular registro (aquí iría tu llamada al API)
-    setTimeout(() => {
-      console.log('Usuario registrado:', this.usuario());
-      this.successMessage.set('¡Cuenta creada exitosamente!');
-      this.isLoading.set(false);
+    const payload: UsuarioAPI = {
+      nombre: u.nombre,
+      edad: Number(u.edad),
+      genero: u.genero,
+      correo: u.correo,
+      celular: Number(u.celular),
+      contrasena: u.contrasena,
+      fechaRegistro: new Date().toISOString(),
+      activo: true
+    };
 
-      // Redirigir al login después de 2 segundos
-      setTimeout(() => {
-        this.router.navigate(['/login']);
-      }, 2000);
-    }, 1500);
+    this.http.post(`${environment.apiUsuario}CrearUsuario`, payload).subscribe({
+      next: () => {
+        this.successMessage.set('¡Cuenta creada exitosamente!');
+        this.isLoading.set(false);
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 2000);
+      },
+      error: (err) => {
+        console.error('Error al crear usuario:', err);
+        this.errorMessage.set('Error al crear la cuenta. Por favor intenta de nuevo.');
+        this.isLoading.set(false);
+      }
+    });
   }
 
   goToLogin(): void {

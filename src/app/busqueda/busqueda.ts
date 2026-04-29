@@ -25,12 +25,12 @@ export class Busqueda implements OnInit {
   showIngresos = signal(true);
   showEgresos = signal(true);
   dropdownOpen = signal(false);
+  ismodale = signal(false);
 
   // Datos de transacciones
   allTransactions = signal<Transaction[]>([]);
   usuarioId: number = 0;
   selectedTransaction: Transaction | null = null;
-  ismodale:boolean = false;
   // Computed signal para filtrar transacciones
   filteredTransactions = computed(() => {
     const search = this.searchText().toLowerCase();
@@ -156,11 +156,12 @@ export class Busqueda implements OnInit {
   }
 
   viewDetails(transaction: Transaction): void {
-    this.ismodale = true;
+    this.ismodale.set(true);
     this.selectedTransaction = transaction;
   }
 
 closeModal(): void {
   this.selectedTransaction = null;
+  this.ismodale.set(false);
 }
 }

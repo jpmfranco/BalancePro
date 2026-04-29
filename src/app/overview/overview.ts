@@ -69,8 +69,8 @@ export class Overview implements OnInit {
   chartListo: boolean = false;
 
   // Modales
-  showIngresoModal:boolean = false;
-  showGastoModal:boolean = false;
+  showIngresoModal = signal(false);
+  showGastoModal = signal(false);
   isLoading:boolean = false
   errorMessage = signal('');
   successMessage = signal('');
@@ -268,13 +268,13 @@ export class Overview implements OnInit {
 
   // Métodos para Modal de Ingreso
   openIngresoModal(): void {
-    this.showIngresoModal = true;
+    this.showIngresoModal.set(true);
     this.errorMessage.set('');
     this.successMessage.set('');
   }
 
   closeIngresoModal(): void {
-    this.showIngresoModal = false;
+    this.showIngresoModal.set(false);
     this.ingreso.set({
       descripcion: '',
       fecha: new Date().toISOString().split('T')[0],
@@ -336,13 +336,13 @@ export class Overview implements OnInit {
 
   // Métodos para Modal de Gasto
   openGastoModal(): void {
-    this.showGastoModal = true;
+    this.showGastoModal.set(true);
     this.errorMessage.set('');
     this.successMessage.set('');
   }
 
   closeGastoModal(): void {
-    this.showGastoModal = false;
+    this.showGastoModal.set(false);
     this.gasto.set({
       descripcion: '',
       fecha: new Date().toISOString().split('T')[0],
