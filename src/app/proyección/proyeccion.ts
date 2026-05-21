@@ -2,7 +2,7 @@ import { Component, OnInit, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { NgApexchartsModule } from 'ng-apexcharts';
-import { IaService } from '../Services/IAService' 
+import { IaService } from '../Services/IAService'
 import { UsuarioService } from '../Services/usuario-service';
 import { HttpClient } from '@angular/common/http';
 import {
@@ -13,7 +13,7 @@ import {
 @Component({
   selector: 'app-proyeccion',
   standalone: true,
-  imports: [CommonModule, NgApexchartsModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, NgApexchartsModule, RouterLink],
   templateUrl: './proyeccion.html',
   styleUrls: ['./proyeccion.css']
 })
@@ -29,11 +29,11 @@ export class Proyeccion implements OnInit {
   errorPerfil: string = '';
 
   constructor(
-    private router: Router, 
-    private iaService: IaService, 
+    private router: Router,
+    private iaService: IaService,
     private usuarioService: UsuarioService,
     private cdr: ChangeDetectorRef,
-    private http: HttpClient // <--- AGREGA ESTO
+    private http: HttpClient
   ) {
     this.initChartOptions();
   }

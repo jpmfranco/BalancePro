@@ -119,6 +119,7 @@ body{
   margin-left: 260px;
   flex: 1;
   min-height: 100vh;
+  background-color: #0f172a;
 }
 
 /* Overview Container */
