@@ -100,13 +100,16 @@ export class Registro {
       activo: true
     };
 
-    this.http.post(`${environment.apiUsuario}CrearUsuario`, payload).subscribe({
-      next: () => {
-        this.successMessage.set('¡Cuenta creada exitosamente!');
+    this.http.post<any>(`${environment.apiUsuario}CrearUsuario`, payload).subscribe({
+      next: (respuesta) => {
+        this.successMessage.set('¡Cuenta creada exitosamente! Configurando tu perfil...');
         this.isLoading.set(false);
+        if (respuesta && respuesta.id) {
+          localStorage.setItem('userId', respuesta.id.toString());
+        }
         setTimeout(() => {
-          this.router.navigate(['/login']);
-        }, 2000);
+          this.router.navigate(['/perfil-financiero']);
+        }, 1500);
       },
       error: (err) => {
         console.error('Error al crear usuario:', err);

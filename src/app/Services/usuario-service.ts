@@ -31,10 +31,10 @@ export class UsuarioService {
     return this.http.get(`${this.apiI}ObtenerIngreso`);
   }
   getGastosPorUsuario(id: number):Observable<any>{
-    return this.http.get(`${this.apiG}ObtenerGasto`, { params: { id: id.toString() } });
+    return this.http.get(`${this.apiG}ObtenerGastoporID/${id}`);
   }
   getIngresosPorUsuario(id: number):Observable<any>{
-    return this.http.get(`${this.apiI}ObtenerIngreso`, { params: { id: id.toString() } });
+    return this.http.get(`${this.apiI}ObtenerIngresoporID/${id}`);
   }
   getGastosSuma(id: number):Observable<any>{
     return this.http.get(`${this.apiG}ObtenerSumaTotal`, { params: { id: id.toString() } });

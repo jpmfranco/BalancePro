@@ -1,163 +1,210 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { NgApexchartsModule } from 'ng-apexcharts';
+import { IaService } from '../Services/IAService' 
+import { UsuarioService } from '../Services/usuario-service';
+import { HttpClient } from '@angular/common/http';
 import {
-  ApexAxisChartSeries,
-  ApexChart,
-  ApexXAxis,
-  ApexYAxis,
-  ApexStroke,
-  ApexLegend,
-  ApexDataLabels,
-  ApexFill
+  ApexAxisChartSeries, ApexChart, ApexXAxis, ApexYAxis,
+  ApexStroke, ApexLegend, ApexDataLabels, ApexFill, ApexMarkers, ApexTooltip
 } from 'ng-apexcharts';
-
-export type ChartOptions = {
-  series: ApexAxisChartSeries;
-  chart: ApexChart;
-  xaxis: ApexXAxis;
-  yaxis: ApexYAxis;
-  stroke: ApexStroke;
-  dataLabels: ApexDataLabels;
-  legend: ApexLegend;
-  colors: string[];
-  fill: ApexFill;
-};
-
-interface MonthProjection {
-  month: string;
-  balance: number;
-  isPositive: boolean;
-}
-
-interface Movement {
-  concepto: string;
-  tipo: 'Ingreso' | 'Egreso';
-  monto: number;
-}
 
 @Component({
   selector: 'app-proyeccion',
   standalone: true,
-  imports: [CommonModule, NgApexchartsModule, RouterLink],
+  imports: [CommonModule, NgApexchartsModule, RouterLink, RouterLinkActive],
   templateUrl: './proyeccion.html',
   styleUrls: ['./proyeccion.css']
 })
 export class Proyeccion implements OnInit {
+
+  ahorroConsejos: any[] = [];
+  totalAhorroPotencial: number = 0;
   menuOpen = signal(false);
+  monthlyProjections: any[] = [];
+  movements: any[] = [];
+  public chartOptions: any;
+  private idUsuario: number = 1;
+  errorPerfil: string = '';
 
-  // Proyecciones mensuales
-  monthlyProjections: MonthProjection[] = [
-    { month: 'Mes 1', balance: 8500, isPositive: true },
-    { month: 'Mes 2', balance: 9200, isPositive: true },
-    { month: 'Mes 3', balance: 7900, isPositive: false }
-  ];
-
-  // Movimientos estimados
-  movements: Movement[] = [
-    { concepto: 'Ingreso freelance', tipo: 'Ingreso', monto: 3500 },
-    { concepto: 'Renta oficina', tipo: 'Egreso', monto: -2800 },
-    { concepto: 'Servicios', tipo: 'Egreso', monto: -1200 },
-    { concepto: 'Proyecto cliente', tipo: 'Ingreso', monto: 4000 },
-    { concepto: 'Transporte', tipo: 'Egreso', monto: -900 }
-  ];
-
-  // Configuración de la gráfica
-  public chartOptions: Partial<ChartOptions> = {
-    series: [
-      {
-        name: 'Ingresos',
-        data: [12000, 13500, 12800]
-      },
-      {
-        name: 'Egresos',
-        data: [3500, 4300, 4900]
-      }
-    ],
-    chart: {
-      height: 350,
-      type: 'line',
-      toolbar: {
-        show: false
-      },
-      background: 'transparent'
-    },
-    dataLabels: {
-      enabled: false
-    },
-    stroke: {
-      width: 4,
-      curve: 'smooth',
-      lineCap: 'round',
-    },
-    colors: ['#22c55e', '#f87171'],
-    xaxis: {
-      categories: ['Mes 1', 'Mes 2', 'Mes 3'],
-      labels: {
-        style: {
-          colors: '#ffffff',
-          fontSize: '12px'
-        }
-      },
-      axisBorder: {
-        color: 'white'
-      },
-      axisTicks: {
-        color: 'white'
-      }
-    },
-    yaxis: {
-      min: 0,
-      labels: {
-        style: {
-          colors: '#ffffff',
-          fontSize: '12px'
-        },
-        formatter: (value) => {
-          return '$' + value.toLocaleString();
-        }
-      }
-    },
-    legend: {
-      position: 'bottom',
-      labels: {
-        colors: '#ffffff'
-      }
-    },
-    fill: {
-      type: 'solid',
-      opacity: 0.5
-    }
-  };
-
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router, 
+    private iaService: IaService, 
+    private usuarioService: UsuarioService,
+    private cdr: ChangeDetectorRef,
+    private http: HttpClient // <--- AGREGA ESTO
+  ) {
+    this.initChartOptions();
+  }
 
   ngOnInit(): void {
-    const usuario = sessionStorage.getItem('usuario');
-    if (!usuario) {
+    const usuarioStr = sessionStorage.getItem('usuario');
+    if (!usuarioStr) {
       this.router.navigate(['/login']);
+      return;
     }
+    this.cargarDatosUsuario(usuarioStr);
+    this.obtenerGastosRealesIA();
   }
-
-  toggleMenu(): void {
-    this.menuOpen.update(value => !value);
-  }
-
-  logout(): void {
-    sessionStorage.removeItem('usuario');
-    this.router.navigate(['/login']);
-  }
-
-  navigateTo(section: string): void {
-    this.router.navigate([`/${section}`]);
-  }
-
-  formatCurrency(amount: number): string {
-    const sign = amount >= 0 ? '+' : '';
-    return sign + '$' + Math.abs(amount).toLocaleString('en-US', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+   cargarDatosUsuario(correo: string): void {
+    this.usuarioService.getUsers().subscribe({
+      next: (res) => {
+        const usuarioEncontrado = res.find((u: any) => u.correo === correo);
+        this.idUsuario = usuarioEncontrado.id;
+        console.log(this.idUsuario);
+        this.cargarProyeccionesIA();
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error(err)
     });
   }
+  private initChartOptions() {
+    this.chartOptions = {
+      series: [],
+      chart: { 
+        height: 380, 
+        type: 'area', 
+        toolbar: { show: false }, 
+        background: 'transparent',
+        animations: { enabled: true },
+        zoom: { enabled: false }
+      },
+      colors: ['#22c55e', '#ef4444'],
+      dataLabels: {
+        enabled: true,
+        formatter: (val: any) => '$' + Math.round(Number(val)).toLocaleString(),
+        style: { fontSize: '12px', fontFamily: 'Inter, sans-serif' },
+        background: { enabled: true, foreColor: '#fff', padding: 4, borderRadius: 4, borderColor: '#334155' }
+      },
+      stroke: { width: [3, 1.5], curve: 'smooth' },
+      fill: {
+        type: ['gradient', 'solid'],
+        gradient: { shadeIntensity: 1, opacityFrom: 0.25, opacityTo: 0.05, stops: [0, 90, 100] }
+      },
+      markers: { size: 4, strokeColors: '#334155' },
+      xaxis: { 
+        categories: [], 
+        labels: { style: { colors: '#94a3b8' } } 
+      },
+      yaxis: { 
+        min: 0, 
+        labels: { 
+          style: { colors: '#94a3b8' },
+          formatter: (val: any) => `$${Math.round(val).toLocaleString()}`
+        } 
+      },
+      tooltip: { theme: 'dark' },
+      legend: { show: true, position: 'top', labels: { colors: '#f8fafc' } },
+      grid: { borderColor: '#334155', strokeDashArray: 4 }
+    };
+  }
+
+  consejoIA_Texto: string = "Analizando tus gastos...";
+
+obtenerGastosRealesIA() {
+  console.log(this.idUsuario,"id");
+  this.usuarioService.getGastos().subscribe({
+    next: (gastos: any[]) => {
+      // Filtramos los reales
+      const gastosMalosReales = gastos.filter(g => 
+        g.idUsuario === this.idUsuario && g.clasificacion === 'Malo'
+      );
+
+      this.ahorroConsejos = gastosMalosReales.map(g => ({
+        concepto: g.descripcion,
+        frecuencia: 'Gasto detectado',
+        montoAhorro: g.monto
+      }));
+
+      this.totalAhorroPotencial = this.ahorroConsejos.reduce((acc, curr) => acc + curr.montoAhorro, 0);
+
+      // LLAMADA A TU SCRIPT DE PYTHON (Puerto 8080)
+      if (this.ahorroConsejos.length > 0) {
+        this.http.post('http://localhost:8080/analizar-ahorro', {
+          gastos: this.ahorroConsejos,
+          totalAhorro: this.totalAhorroPotencial
+        }).subscribe({
+          next: (res: any) => {
+            this.consejoIA_Texto = res.mensajeMotivacional;
+            this.cdr.detectChanges();
+          },
+          error: (err) => {
+            console.error("Python no responde:", err);
+            this.consejoIA_Texto = "No pude conectar con el coach financiero.";
+          }
+        });
+      }
+      this.cdr.detectChanges();
+    }
+  });
+}
+
+  getProximosMeses(cantidad: number): string[] {
+    const meses = [];
+    const fecha = new Date();
+    fecha.setMonth(fecha.getMonth() + 1); 
+    for (let i = 0; i < cantidad; i++) {
+      const nombreMes = fecha.toLocaleString('es-ES', { month: 'long' });
+      meses.push(nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1));
+      fecha.setMonth(fecha.getMonth() + 1);
+    }
+    return meses;
+  }
+
+  cargarProyeccionesIA() {
+    this.errorPerfil = '';
+    console.log(this.idUsuario,"id");
+    this.iaService.obtenerAnalisisIA(this.idUsuario).subscribe({
+      next: (res) => {
+        console.log(res,"hola");
+        const ingresos = res.resumenFinanciero?.totalIngresos || 0;
+        const gastos = res.resumenFinanciero?.totalGastos || 0;
+        const listaProyecciones = res.prediccionIA?.proyecciones || [];
+        const nombresMeses = this.getProximosMeses(3);
+
+        if (listaProyecciones.length > 0) {
+          this.monthlyProjections = listaProyecciones.map((p: any, index: number) => {
+            const balanceNeto = p.valor - gastos;
+            return {
+              month: nombresMeses[index],
+              balance: balanceNeto,
+              isPositive: balanceNeto > 0
+            };
+          });
+
+          this.chartOptions = {
+            ...this.chartOptions,
+            series: [
+              { name: 'Balance proyectado:', type: 'area', data: [0, ...this.monthlyProjections.map(p => p.balance)] },
+              { name: 'Gastos actuales:', type: 'line', data: [0, ...listaProyecciones.map(() => gastos)] }
+            ],
+            xaxis: { ...this.chartOptions.xaxis, categories: ['Inicio', ...nombresMeses] }
+          };
+        }
+
+        this.movements = [
+          { concepto: 'Sueldo Mensual', tipo: 'Ingreso', monto: ingresos },
+          { concepto: 'Gastos Totales', tipo: 'Egreso', monto: gastos },
+          { concepto: 'Balance Neto Actual', tipo: 'Ingreso', monto: ingresos - gastos }
+        ];
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        if (err.status === 404) {
+          this.errorPerfil = 'Aún no has configurado tu perfil financiero. Ve a la sección "Perfil" para comenzar.';
+        } else {
+          this.errorPerfil = 'No se pudo cargar el análisis financiero. Intenta de nuevo más tarde.';
+        }
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  formatCurrency(amount: number) {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount);
+  }
+
+  toggleMenu() { this.menuOpen.update(v => !v); }
+  logout() { sessionStorage.clear(); this.router.navigate(['/login']); }
 }

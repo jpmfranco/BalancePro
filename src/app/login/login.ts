@@ -9,7 +9,7 @@ import { UsuarioService } from '../Services/usuario-service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })
@@ -48,13 +48,18 @@ export class Login implements OnInit{
 
     this.isLoading.set(true);
     setTimeout(() => {
-      const json = {
-        correo: this.correo(),
-        contraseña: this.password()
-      }
-      console.log(json);
-      const filter = this.users.filter((f:any)=>f.correo = json.correo);
-      if(filter.length != 0){
+      const correoIngresado = this.correo().trim().toLowerCase();
+      const passwordIngresada = this.password().trim();
+
+      // Buscar usuario por correo Y contraseña (comparación correcta con ===)
+      const usuarioEncontrado = this.users.find(
+        (f: any) =>
+          f.correo?.toLowerCase() === correoIngresado &&
+          f.contrasena === passwordIngresada
+      );
+
+      if (usuarioEncontrado) {
+        // Guardar el objeto completo para que otros componentes puedan leer el ID
         sessionStorage.setItem('usuario', this.correo());
         this.router.navigate(['overview']);
       } else {

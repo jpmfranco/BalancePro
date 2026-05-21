@@ -59,12 +59,13 @@ export class Busqueda implements OnInit {
   constructor(private router: Router, private usuarioService: UsuarioService) {}
 
   ngOnInit(): void {
-    const usuario = sessionStorage.getItem('usuario');
-    if (!usuario) {
+    const usuarioSesion:any = sessionStorage.getItem('usuario');
+    if (!usuarioSesion) {
       this.router.navigate(['/login']);
-    } else {
-      this.loadUserData(usuario);
+      return;
     }
+
+    this.loadUserData(usuarioSesion);
   }
 
   loadUserData(correo: string): void {
@@ -72,6 +73,7 @@ export class Busqueda implements OnInit {
     this.usuarioService.getUsers().subscribe({
       next: (users) => {
         const currentUser = users.find((u: any) => u.correo === correo);
+        console.log(currentUser);
         if (currentUser) {
           this.usuarioId = currentUser.id;
           this.loadTransactions();
@@ -86,20 +88,24 @@ export class Busqueda implements OnInit {
   loadTransactions(): void {
     // Cargar gastos e ingresos en paralelo
     forkJoin({
-      gastos: this.usuarioService.getGastosPorUsuario(this.usuarioId),
-      ingresos: this.usuarioService.getIngresosPorUsuario(this.usuarioId)
+      gastos: this.usuarioService.getGastos(),
+      ingresos: this.usuarioService.getGIngresos()
     }).subscribe({
       next: (result) => {
+        console.log(result.gastos,result.ingresos);
+        const gast = result.gastos.filter((a:any) => a.idUsuario ===  this.usuarioId);
+        console.log(gast,result.ingresos);
+
         // Transformar gastos
-        const gastos: Transaction[] = result.gastos.map((gasto: any) => ({
+        const gastos: Transaction[] = gast.map((gasto: any) => ({
           fecha: gasto.fecha || gasto.fechaGasto || '',
           nombre: gasto.descripcion || 'Gasto',
           tipo: 'Egreso' as const,
           monto: gasto.monto || gasto.cantidad || 0
         }));
-
+        const ing  = result.ingresos.filter((a:any)=>a.idUsuario===this.usuarioId);
         // Transformar ingresos
-        const ingresos: Transaction[] = result.ingresos.map((ingreso: any) => ({
+        const ingresos: Transaction[] = ing.map((ingreso: any) => ({
           fecha: ingreso.fecha,
           nombre:  ingreso.descripcion || 'Ingreso',
           tipo: 'Ingreso' as const,

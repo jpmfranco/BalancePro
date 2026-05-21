@@ -94,10 +94,8 @@ export class Perfil implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
-    
-    // Obtener información del usuario desde el backend
     this.cargarDatosUsuario(usuarioSesion);
-   
+    
   }
   cargarDatosFinancierosUsuario(user:any){
     this.usuarioService.getGastosSuma(user.id).subscribe({
@@ -233,10 +231,8 @@ export class Perfil implements OnInit {
     this.usuarioService.updateUser(u.id, json).subscribe({
       next: (res) => {
         this.usuario = { ...u };
-        // Si cambió el correo, actualizar el sessionStorage
-        if (u.correo !== sessionStorage.getItem('usuario')) {
-          sessionStorage.setItem('usuario', u.correo);
-        }
+        // Actualizar el objeto completo en sessionStorage
+        sessionStorage.setItem('usuario', JSON.stringify(this.usuario));
         this.successMessage = '¡Perfil actualizado exitosamente!';
         this.isLoading = false;
         this.isEditing = false;
@@ -324,10 +320,8 @@ export class Perfil implements OnInit {
     this.usuarioService.updateUser(u.id, json).subscribe({
       next: (res) => {
         this.usuario = { ...u };
-        // Si cambió el correo, actualizar el sessionStorage
-        if (u.correo !== sessionStorage.getItem('usuario')) {
-          sessionStorage.setItem('usuario', u.correo);
-        }
+        // Actualizar el objeto completo en sessionStorage
+        sessionStorage.setItem('usuario', JSON.stringify(this.usuario));
         this.successMessage = '¡Contraseña actualizada exitosamente!';
         this.isLoading = false;
         this.isEditing = false;

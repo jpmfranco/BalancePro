@@ -26,69 +26,105 @@
 <button class="mobile-menu-toggle" (click)="toggleMenu()">Menu</button>
 
 <!-- Main Content -->
-<div class="main-content">
-  <div class="pred-container">
-  <h2>Proyección financiera (Próximos 3 meses)</h2>
-  
-  <!-- Balances mensuales -->
-  <div class="months">
-    @for (projection of monthlyProjections; track projection.month) {
-      <div class="month-card">
-        <h3>{{ projection.month }}</h3>
-        <p class="balance" [class.positivo]="projection.isPositive" [class.negativo]="!projection.isPositive">
-          ${{ projection.balance.toLocaleString() }}
-        </p>
-        <span>Balance estimado</span>
+<main class="main-content">
+    <div class="pred-container">
+      <h2>Proyección Financiera <span class="ai-badge">BalancePro AI</span></h2>
+
+      <!-- Mensaje de error / perfil no configurado -->
+      <div *ngIf="errorPerfil" class="error-perfil-box">
+        <p>⚠️ {{ errorPerfil }}</p>
+        <a routerLink="/perfil" class="btn-configurar-perfil">Configurar perfil financiero</a>
       </div>
-    }
-  </div>
-  
-  <!-- Sección inferior -->
-  <div class="bottom-section">
-    <!-- Gráfica -->
-    <div class="chart-card">
-      <h4>Ingresos vs Egresos</h4>
-      <apx-chart
-        [series]="chartOptions.series!"
-        [chart]="chartOptions.chart!"
-        [xaxis]="chartOptions.xaxis!"
-        [yaxis]="chartOptions.yaxis!"
-        [stroke]="chartOptions.stroke!"
-        [colors]="chartOptions.colors!"
-        [dataLabels]="chartOptions.dataLabels!"
-        [legend]="chartOptions.legend!"
-        [fill]="chartOptions.fill!">
-      </apx-chart>
-    </div>
-    
-    <!-- Tabla de movimientos -->
-    <div class="table-card">
-      <h4>Movimientos estimados</h4>
-      <table>
-        <thead>
-          <tr>
-            <th>Concepto</th>
-            <th>Tipo</th>
-            <th>Monto</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (movement of movements; track movement.concepto) {
-            <tr>
-              <td class="concept">{{ movement.concepto }}</td>
-              <td [class.ingreso]="movement.tipo === 'Ingreso'" 
-                  [class.egreso]="movement.tipo === 'Egreso'">
-                {{ movement.tipo }}
-              </td>
-              <td [class.ingreso]="movement.tipo === 'Ingreso'" 
-                  [class.egreso]="movement.tipo === 'Egreso'">
-                {{ formatCurrency(movement.monto) }}
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  </div>
-  </div>
-</div>
+
+      <div class="months-grid" *ngIf="monthlyProjections.length > 0">
+        <div class="month-card" *ngFor="let projection of monthlyProjections">
+          <span class="month-label">{{ projection.month }}</span>
+          <div class="linea-sep-card"></div>
+          <h3 class="balance" [ngClass]="projection.isPositive ? 'positivo' : 'negativo'">
+            {{ formatCurrency(projection.balance) }}
+          </h3>
+        </div>
+      </div>
+
+      <div class="bottom-section">
+        <div class="glass-card chart-card">
+          <h4><i class="fas fa-chart-line"></i> Tendencia de Balance</h4>
+          <div class="chart-wrapper">
+            <apx-chart
+              *ngIf="chartOptions.series.length > 0"
+              [series]="chartOptions.series"
+              [chart]="chartOptions.chart"
+              [xaxis]="chartOptions.xaxis"
+              [yaxis]="chartOptions.yaxis"
+              [dataLabels]="chartOptions.dataLabels"
+              [stroke]="chartOptions.stroke"
+              [colors]="chartOptions.colors"
+              [fill]="chartOptions.fill"
+              [legend]="chartOptions.legend"
+              [grid]="chartOptions.grid">
+            </apx-chart>
+          </div>
+        </div>
+
+        <div class="glass-card table-card">
+          <div class="micro-contenedor">
+            <table class="tabla-compacta">
+              <tbody>
+                <tr>
+                  <td rowspan="2" class="celda-base celda-main">
+                    <div class="flex-col">
+                      <span class="txt-label">Balance Actual</span>
+                      <div class="linea-sep"></div>
+                      <span class="txt-monto-lg" [ngClass]="(movements[2]?.monto >= 0) ? 'v-verde' : 'v-rojo'">
+                        {{ formatCurrency(movements[2]?.monto || 0) }}
+                      </span>
+                    </div>
+                  </td>
+                  <td class="celda-base">
+                    <div class="flex-col-mini">
+                      <span class="txt-label-sm">Ingresos</span>
+                      <span class="txt-monto-sm v-verde">{{ formatCurrency(movements[0]?.monto || 0) }}</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="celda-base">
+                    <div class="flex-col-mini">
+                      <span class="txt-label-sm">Egresos</span>
+                      <span class="txt-monto-sm v-rojo">{{ formatCurrency(movements[1]?.monto || 0) }}</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="ahorro-oportunidades">
+            <div class="linea-sep-full"></div>
+            <h5><i class="fas fa-robot"></i> Análisis de Gastos</h5>
+            
+            <div class="contenedor-scroll-gastos">
+              <div class="lista-malos-gastos">
+                <div *ngIf="ahorroConsejos.length === 0" class="resumen-ia-box">
+                  <p class="v-verde">✨ ¡Felicidades! No hay gastos malos detectados.</p>
+                </div>
+          
+                <div class="gasto-item" *ngFor="let consejo of ahorroConsejos">
+                  <div class="gasto-info">
+                    <span class="gasto-nombre">{{ consejo.concepto }}</span>
+                    <span class="gasto-frecuencia" style="color: #ef4444;">Hábito Crítico</span>
+                  </div>
+                  <div class="gasto-ahorro">
+                    <span class="etiqueta-ahorro">Monto:</span>
+                    <span class="monto-ahorro">{{ formatCurrency(consejo.montoAhorro) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div> 
+
+            <div class="resumen-ia-box" *ngIf="ahorroConsejos.length > 0">
+              <p><i class="fas fa-comment-dots"></i> <strong>Consejo de BalancePro AI:</strong></p>
+              <p class="txt-consejo-ia" style="font-style: italic; margin-top: 5px;">{{ consejoIA_Texto }}</p>
+            </div>
+          </div>
+        </div> </div> </div> </main>

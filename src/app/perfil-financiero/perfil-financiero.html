@@ -1,0 +1,162 @@
+<div class="perfil-container">
+  <div class="perfil-card">
+    <div class="perfil-header">
+      <div class="logo">📊</div>
+      <h1>Balance Pro</h1>
+      <p>Cuéntanos sobre tu perfil financiero</p>
+      <span class="subtitle">Esta información nos ayuda a personalizar tus recomendaciones</span>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="perfil-form">
+
+      <!-- Tipo de perfil -->
+      <div class="form-group">
+        <label for="perfil">¿Cuál es tu situación laboral? *</label>
+        <select
+          id="perfil"
+          [value]="perfil().Perfil"
+          (change)="updateField('Perfil', +$any($event.target).value)"
+          [disabled]="isLoading()"
+        >
+          <option value="0">Estudiante</option>
+          <option value="1">Empleado</option>
+          <option value="2">Independiente / Freelance</option>
+          <option value="3">Empresario</option>
+        </select>
+      </div>
+
+      <!-- Estabilidad de ingresos -->
+      <div class="form-group">
+        <label for="estabilidad">¿Tus ingresos son estables? *</label>
+        <select
+          id="estabilidad"
+          [value]="perfil().Estabilidad"
+          (change)="updateField('Estabilidad', +$any($event.target).value)"
+          [disabled]="isLoading()"
+        >
+          <option value="1">Sí, son estables</option>
+          <option value="0">No, varían cada mes</option>
+        </select>
+      </div>
+
+      <!-- Categoría principal de gasto -->
+      <div class="form-group">
+        <label for="categoria">¿En qué gastas más? *</label>
+        <select
+          id="categoria"
+          [value]="perfil().Categoria"
+          (change)="updateField('Categoria', +$any($event.target).value)"
+          [disabled]="isLoading()"
+        >
+          <option value="0">Vivienda (renta, hipoteca)</option>
+          <option value="1">Transporte</option>
+          <option value="2">Comida</option>
+          <option value="3">Entretenimiento</option>
+        </select>
+      </div>
+
+      <!-- Tendencia de ingresos -->
+      <div class="form-group">
+        <label for="tendIngresos">¿Cómo han cambiado tus ingresos últimamente? *</label>
+        <select
+          id="tendIngresos"
+          [value]="perfil().TendIngresos"
+          (change)="updateField('TendIngresos', +$any($event.target).value)"
+          [disabled]="isLoading()"
+        >
+          <option value="1">Están subiendo</option>
+          <option value="0">Se mantienen igual</option>
+          <option value="-1">Están bajando</option>
+        </select>
+      </div>
+
+      <!-- Tendencia de egresos -->
+      <div class="form-group">
+        <label for="tendEgresos">¿Cómo han cambiado tus gastos últimamente? *</label>
+        <select
+          id="tendEgresos"
+          [value]="perfil().TendEgresos"
+          (change)="updateField('TendEgresos', +$any($event.target).value)"
+          [disabled]="isLoading()"
+        >
+          <option value="1">Están subiendo</option>
+          <option value="0">Se mantienen igual</option>
+          <option value="-1">Están bajando</option>
+        </select>
+      </div>
+
+      <!-- Control financiero -->
+      <div class="form-group">
+        <label for="control">¿Qué tan bien controlas tus finanzas? (1 = poco, 5 = mucho) *</label>
+        <select
+          id="control"
+          [value]="perfil().Control"
+          (change)="updateField('Control', +$any($event.target).value)"
+          [disabled]="isLoading()"
+        >
+          <option value="1">1 — Casi nunca llevo registro</option>
+          <option value="2">2 — A veces reviso mis gastos</option>
+          <option value="3">3 — Llevo un control básico</option>
+          <option value="4">4 — Controlo bien mis finanzas</option>
+          <option value="5">5 — Tengo control total</option>
+        </select>
+      </div>
+
+      <!-- Planificación financiera -->
+      <div class="form-group">
+        <label for="planificacion">¿Qué tanto planificas tus finanzas a futuro? (1 = poco, 5 = mucho) *</label>
+        <select
+          id="planificacion"
+          [value]="perfil().Planificacion"
+          (change)="updateField('Planificacion', +$any($event.target).value)"
+          [disabled]="isLoading()"
+        >
+          <option value="1">1 — No planeo, gasto al momento</option>
+          <option value="2">2 — Planeo a veces</option>
+          <option value="3">3 — Tengo metas a corto plazo</option>
+          <option value="4">4 — Planeo a mediano plazo</option>
+          <option value="5">5 — Tengo plan financiero a largo plazo</option>
+        </select>
+      </div>
+
+      <!-- Mensaje de error -->
+      @if (errorMessage()) {
+        <div class="error-message">
+          <span>⚠ {{ errorMessage() }}</span>
+        </div>
+      }
+
+      <!-- Mensaje de éxito -->
+      @if (successMessage()) {
+        <div class="success-message">
+          <span>✓ {{ successMessage() }}</span>
+        </div>
+      }
+
+      <!-- Botones -->
+      <div class="botones">
+        <button
+          type="submit"
+          class="perfil-button primary"
+          [disabled]="isLoading()"
+        >
+          @if (!isLoading()) {
+            <span>Crear perfil financiero</span>
+          } @else {
+            <span>Analizando...</span>
+          }
+        </button>
+
+        <button
+          type="button"
+          class="perfil-button secondary"
+          (click)="omitir()"
+          [disabled]="isLoading()"
+        >
+          Omitir por ahora
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
