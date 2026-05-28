@@ -1,9 +1,9 @@
 export const environment = {
         production:true,
-        apiGasto: 'https://api.balancepro.qzz.io/api/Gastoes/',
-        apiIngreso: 'https://api.balancepro.qzz.io/api/Ingresoes/',
-        apiUsuario: 'https://api.balancepro.qzz.io/api/Usuarios/',
-        apiIA: 'https://api.balancepro.qzz.io/api/IA/'
+        apiGasto: 'https://balanceproapi.onrender.com/api/Gastoes/',
+        apiIngreso: 'https://balanceproapi.onrender.com/api/Ingresoes/',
+        apiUsuario: 'https://balanceproapi.onrender.com/api/Usuarios/',
+        apiIA: 'https://balanceproapi.onrender.com/api/IA/'
         // Para producción en Docker:
         // apiGasto: '/api/Gastoes/',
         // apiIngreso: '/api/Ingresoes/',
