@@ -1,66 +1,79 @@
 # BalancePro
-Aplicación web de gestión de finanzas personales desarrollada en Angular 20. Permite a los usuarios registrar, visualizar y analizar sus ingresos y gastos mediante una interfaz moderna e intuitiva.
+A personal finance management web application built with Angular 20. It allows users to track, visualize, and analyze their income and expenses through a modern and intuitive user interface.
 
-## Tecnologías
+## Technologies
 
-Angular 20
-TypeScript
-ng-apexcharts — gráficas interactivas
-HTML5 / CSS3
-Nginx — servidor web en producción
-Docker
+* Angular 20
+* TypeScript
+* ng-apexcharts — interactive charts
+* HTML5 / CSS3
+* Nginx — production web server
+* Docker
 
+## Prerequisites
 
-## Requisitos previos
+* Node.js 20+
+* Angular CLI
+* Docker (optional)
 
-Node.js 20+
-Angular CLI
-Docker (opcional)
+## Installation and Setup
 
-
-## Instalación y configuración
-1. Clona el repositorio:
-bashgit clone https://github.com/jpmfranco/BalancePro.git
+1. Clone the repository:
+git clone [https://github.com/jpmfranco/BalancePro.git](https://github.com/jpmfranco/BalancePro.git)
 cd BalancePro/AppEcono
-2. Instala las dependencias:
-bashnpm install
-3. Configura las URLs del backend en src/enviroment/enviroment.ts:
-typescriptexport const environment = {
+Install the dependencies:
+
+Bash
+npm install
+Configure the backend URLs in src/enviroment/enviroment.ts:
+
+TypeScript
+export const environment = {
   production: false,
   apiGasto: 'http://localhost:7252/api/Gastoes/',
   apiIngreso: 'http://localhost:7252/api/Ingresoes/',
   apiUsuario: 'http://localhost:7252/api/Usuarios/'
 };
-4. Corre el proyecto en desarrollo:
-bashng serve
-5. Accede en el navegador:
+Run the project in development mode:
+
+Bash
+ng serve
+Access it in your browser:
 http://localhost:4200
 
-## Correr con Docker
-1. Construye la imagen:
-bashdocker build -t balancepro-frontend .
-2. O usa Docker Compose desde la raíz del proyecto:
-bashdocker-compose up --build
-3. Accede en el navegador:
+Running with Docker
+Build the Docker image:
+
+Bash
+docker build -t balancepro-frontend .
+Or use Docker Compose from the project root:
+
+Bash
+docker-compose up --build
+Access it in your browser:
 http://localhost:4200
 
-
-##  Módulos de la aplicación
+Application Modules
 Overview
-Panel principal del sistema. Muestra el balance financiero actualizado del usuario, una gráfica de líneas interactiva con los movimientos de los últimos 7 días diferenciando ingresos y egresos, accesos rápidos a los demás módulos y botones para registrar nuevos ingresos y gastos mediante modales con validación reactiva.
-Búsqueda
-Módulo de consulta y filtrado de transacciones. Permite buscar movimientos por nombre, filtrar por tipo (ingreso o egreso) y ver los detalles de cada transacción mediante un modal. Muestra un contador con el total de resultados encontrados.
-Proyección
-Módulo de predicción financiera. Consume el microservicio de inteligencia artificial en Python para mostrar la proyección estimada de ingresos y gastos para los próximos tres meses basada en los datos históricos del usuario.
-Perfil
-Panel de información personal del usuario. Muestra el nombre, correo, edad, género, celular y fecha de registro. Incluye estadísticas financieras personalizadas: total de ingresos, total de gastos, balance actual y número de transacciones. Permite editar la información personal y cambiar la contraseña.
+The main system dashboard. It displays the user's updated financial balance, an interactive line chart tracking transactions from the last 7 days (differentiating income and expenses), quick access shortcuts to other modules, and action buttons to log new income and expenses via modals with reactive validation.
 
-##  Autenticación
-El sistema utiliza sessionStorage para gestionar la sesión del usuario. Al iniciar sesión se almacena el correo del usuario y se verifica en cada componente mediante el guard de rutas. Si no existe sesión activa, el usuario es redirigido automáticamente al login.
+Search
+The transaction query and filtering module. It allows users to search for financial records by name, filter by type (income or expense), and view specific transaction details through a modal. It also includes a counter displaying the total number of results found.
 
-##  Configuración de Nginx (producción)
-El archivo nginx.conf configura el servidor web para redirigir todas las rutas al index.html de Angular, habilitando el routing del lado del cliente:
-nginxserver {
+Projection
+The financial forecasting module. It consumes a Python-based Artificial Intelligence microservice to display the estimated income and expense projections for the next three months, based on the user's historical data.
+
+Profile
+The user's personal information panel. It displays their name, email, age, gender, phone number, and registration date. It includes custom financial statistics: total income, total expenses, current balance, and transaction count. It also allows users to edit their personal information and change their password.
+
+Authentication
+The system utilizes sessionStorage to manage user sessions. Upon logging in, the user's email is stored and verified within each component using route guards. If no active session is detected, the user is automatically redirected to the login page.
+
+Nginx Configuration (Production)
+The nginx.conf file configures the web server to redirect all routes to Angular's index.html, enabling seamless client-side routing:
+
+Nginx
+server {
     listen 80;
     server_name localhost;
     root /usr/share/nginx/html;
@@ -70,30 +83,27 @@ nginxserver {
         try_files $uri $uri/ /index.html;
     }
 }
-
-##  Comandos útiles
-bash# Instalar dependencias:
+Useful Commands
+Bash
+# Install dependencies
 npm install
 
- -Servidor de desarrollo:
+# Development server
 ng serve
 
--Build de producción:
+# Production build
 ng build --configuration production
 
--Ejecutar tests:
+# Run tests
 ng test
 
--Verificar versión de Angular:
+# Check Angular version
 ng version
-
-##  Autores
-
-### Juan Pablo Mayagoitia Franco
-### Luis Angel Reyes Valdivia
-
-### Asesor: Jose Juan Meza Espinosa
+Authors
+Juan Pablo Mayagoitia Franco
+Luis Angel Reyes Valdivia
+Advisor: Jose Juan Meza Espinosa
 CUCEI, Universidad de Guadalajara
 
-##  Licencia
-Propietario del código — Todos los derechos reservados © 2026
+License
+Proprietary Code — All rights reserved © 2026
