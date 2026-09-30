@@ -306,12 +306,14 @@ body{
     bottom: 24px;
     right: 24px;
   }
-
+  .nav-item.logout{
+    margin-bottom: 20px;
+  }
   .fab-ingreso,
   .fab-gasto {
-    width: 56px;
-    height: 56px;
-    font-size: 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    font-size: 12px;
   }
 }
 

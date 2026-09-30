@@ -212,6 +212,11 @@
 }
 
 /* Table */
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 table {
   width: 100%;
   background: rgb(56, 55, 55);
@@ -326,6 +331,7 @@ tbody td:hover{
 
   table {
     font-size: 12px;
+    min-width: 560px;
   }
 
   thead th, tbody td {

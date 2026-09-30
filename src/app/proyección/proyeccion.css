@@ -196,7 +196,9 @@ td { padding: 14px 12px; border-bottom: 1px solid #334155; }
 
 /* RESPONSIVE */
 @media (max-width: 1024px) {
-  .sidebar { display: none; }
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.active { transform: translateX(0); }
+  .mobile-menu-toggle { display: block; }
   .main-content { margin-left: 0; padding: 20px; }
   .months-grid { grid-template-columns: 1fr; }
   .bottom-section { grid-template-columns: 1fr; }
