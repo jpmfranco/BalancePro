@@ -114,11 +114,12 @@ export class Overview implements OnInit {
 
   ngOnInit(): void {
     const usuario: any = sessionStorage.getItem('usuario');
-    if (!usuario) {
+    const correo: any = sessionStorage.getItem('correo');
+    if (!usuario || !correo) {
       this.router.navigate(['/login']);
     } else {
       this.usuario.set(usuario);
-      this.cargarDatosUsuario(usuario);
+      this.cargarDatosUsuario(correo);
     }
   }
 

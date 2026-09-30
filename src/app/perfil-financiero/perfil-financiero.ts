@@ -47,9 +47,10 @@ export class PerfilFinanciero {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    const userId = localStorage.getItem('userId');
+    // El userId vive en sessionStorage (login) o en localStorage (recién registrados)
+    const userId = sessionStorage.getItem('userId') ?? localStorage.getItem('userId');
     if (!userId) {
-      this.errorMessage.set('No se encontró el usuario. Por favor regístrate de nuevo.');
+      this.errorMessage.set('No se encontró el usuario. Por favor inicia sesión de nuevo.');
       return;
     }
 
@@ -60,7 +61,9 @@ export class PerfilFinanciero {
         this.successMessage.set('¡Perfil financiero creado! Redirigiendo...');
         this.isLoading.set(false);
         setTimeout(() => {
-          this.router.navigate(['/login']);
+          // El perfil alimenta la proyección: volver ahí sirve tanto
+          // para nuevos registros como para reconfiguraciones.
+          this.router.navigate(['/proyeccion']);
         }, 2000);
       },
       error: (err) => {

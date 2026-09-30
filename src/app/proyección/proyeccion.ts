@@ -40,17 +40,19 @@ export class Proyeccion implements OnInit {
 
   ngOnInit(): void {
     const usuarioStr = sessionStorage.getItem('usuario');
-    if (!usuarioStr) {
+    const correoStr = sessionStorage.getItem('correo');
+    if (!usuarioStr || !correoStr) {
       this.router.navigate(['/login']);
       return;
     }
-    this.cargarDatosUsuario(usuarioStr);
+    this.cargarDatosUsuario(correoStr);
     this.obtenerGastosRealesIA();
   }
    cargarDatosUsuario(correo: string): void {
     this.usuarioService.getUsers().subscribe({
       next: (res) => {
         const usuarioEncontrado = res.find((u: any) => u.correo === correo);
+        if (!usuarioEncontrado) return;
         this.idUsuario = usuarioEncontrado.id;
         console.log(this.idUsuario);
         this.cargarProyeccionesIA();
@@ -163,6 +165,12 @@ obtenerGastosRealesIA() {
         const listaProyecciones = res.prediccionIA?.proyecciones || [];
         const nombresMeses = this.getProximosMeses(3);
 
+        // Sin servicio IA: el backend devuelve 200 con advertencia.
+        // Se muestra el resumen igual y se avisa en el coach.
+        if (res.advertencia) {
+          this.consejoIA_Texto = res.advertencia;
+        }
+
         if (listaProyecciones.length > 0) {
           this.monthlyProjections = listaProyecciones.map((p: any, index: number) => {
             const balanceNeto = p.valor - gastos;
@@ -192,7 +200,7 @@ obtenerGastosRealesIA() {
       },
       error: (err) => {
         if (err.status === 404) {
-          this.errorPerfil = 'Aún no has configurado tu perfil financiero. Ve a la sección "Perfil" para comenzar.';
+          this.errorPerfil = 'Aún no has configurado tu perfil financiero. Usa el botón de abajo para configurarlo.';
         } else {
           this.errorPerfil = 'No se pudo cargar el análisis financiero. Intenta de nuevo más tarde.';
         }

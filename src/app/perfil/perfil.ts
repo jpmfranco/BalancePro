@@ -90,11 +90,12 @@ export class Perfil implements OnInit {
 
   ngOnInit(): void {
     const usuarioSesion = sessionStorage.getItem('usuario');
-    if (!usuarioSesion) {
+    const correoSesion = sessionStorage.getItem('correo');
+    if (!usuarioSesion || !correoSesion) {
       this.router.navigate(['/login']);
       return;
     }
-    this.cargarDatosUsuario(usuarioSesion);
+    this.cargarDatosUsuario(correoSesion);
     
   }
   cargarDatosFinancierosUsuario(user:any){

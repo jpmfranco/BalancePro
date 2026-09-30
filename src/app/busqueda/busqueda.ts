@@ -60,12 +60,13 @@ export class Busqueda implements OnInit {
 
   ngOnInit(): void {
     const usuarioSesion:any = sessionStorage.getItem('usuario');
-    if (!usuarioSesion) {
+    const correoSesion:any = sessionStorage.getItem('correo');
+    if (!usuarioSesion || !correoSesion) {
       this.router.navigate(['/login']);
       return;
     }
 
-    this.loadUserData(usuarioSesion);
+    this.loadUserData(correoSesion);
   }
 
   loadUserData(correo: string): void {

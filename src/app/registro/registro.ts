@@ -102,14 +102,41 @@ export class Registro {
 
     this.http.post<any>(`${environment.apiUsuario}CrearUsuario`, payload).subscribe({
       next: (respuesta) => {
-        this.successMessage.set('¡Cuenta creada exitosamente! Configurando tu perfil...');
-        this.isLoading.set(false);
-        if (respuesta && respuesta.id) {
-          localStorage.setItem('userId', respuesta.id.toString());
-        }
-        setTimeout(() => {
-          this.router.navigate(['/perfil-financiero']);
-        }, 1500);
+        // Auto-login: perfil-financiero llama a POST analizar (protegido),
+        // así que necesitamos el token antes de navegar. Se usa la
+        // contraseña tal cual se registró (sin trim: es el valor hasheado).
+        this.http
+          .post<any>(`${environment.apiUrl}/api/Auth/login`, {
+            correo: u.correo.trim().toLowerCase(),
+            contrasena: u.contrasena,
+          })
+          .subscribe({
+            next: (login) => {
+              sessionStorage.setItem('token', login.token);
+              sessionStorage.setItem('usuario', login.usuario.nombre);
+              sessionStorage.setItem('userId', login.usuario.id.toString());
+              sessionStorage.setItem('correo', login.usuario.correo);
+              if (respuesta && respuesta.id) {
+                localStorage.setItem('userId', respuesta.id.toString());
+              }
+              this.successMessage.set('¡Cuenta creada exitosamente! Configurando tu perfil...');
+              this.isLoading.set(false);
+              setTimeout(() => {
+                this.router.navigate(['/perfil-financiero']);
+              }, 1500);
+            },
+            error: () => {
+              // Cuenta creada pero auto-login falló: login manual
+              this.isLoading.set(false);
+              if (respuesta && respuesta.id) {
+                localStorage.setItem('userId', respuesta.id.toString());
+              }
+              this.successMessage.set('¡Cuenta creada! Ahora inicia sesión.');
+              setTimeout(() => {
+                this.router.navigate(['/login']);
+              }, 1500);
+            },
+          });
       },
       error: (err) => {
         console.error('Error al crear usuario:', err);
